@@ -13,7 +13,6 @@ pygame.init()
 screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 white = (255, 255, 255)
-myfont = pygame.font.SysFont("Comic Sans MS", 30)
 image_constant = (75, 75)
 board_image = pygame.image.load(
     r"Images\board.png")
@@ -213,10 +212,28 @@ def rook_moves(x, y, startx, starty):
         returner = False
     return returner
 
+def white_pawn_moves(x, y, startx, starty, first):
+    if x == 0 and y == -1 and not piecethere(startx, starty - 1):
+        return True
+    elif abs(x)==1 and y == -1 and piecethereexclude(startx + x, starty - 1):
+        return True
+    elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1) and first == 0:
+        return True
+    else:
+        return False
 
+def black_pawn_moves(x, y, startx, starty, first):
+    if x == 0 and y == 1 and not piecethere(startx, starty + 1):
+        return True
+    elif abs(x)==1 and y == 1 and piecethereexclude(startx + x, starty + 1):
+        return True
+    elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1) and first == 0:
+        return True
+    else:
+        return False
 
 class Piece:
-    def __init__(self, name, xpos, ypos, colour, image=wking_image):
+    def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num = 0):
         self.xpos = xpos
         self.ypos = ypos
         self.colour = colour
@@ -224,6 +241,7 @@ class Piece:
         self.image = image
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
+        self.move_num = move_num
 
     def info(self):
         print(self.xpos, self.ypos)
@@ -355,6 +373,14 @@ while run:
                     movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
                 elif item.name[1] == "r":
                     movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
+                elif item.name[0:2] == "wp":
+                    movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num)
+                    if movevalid:
+                        item.move_num += 1
+                elif item.name[0:2] == "bp":
+                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num)
+                    if movevalid:
+                        item.move_num += 1
                 else:
                     movevalid = True
                 print(f"{movevalid} move valid")
