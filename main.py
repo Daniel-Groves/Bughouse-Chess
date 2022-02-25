@@ -8,13 +8,18 @@ screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 white = (255, 255, 255)
 myfont = pygame.font.SysFont("Comic Sans MS", 30)
-
 image_constant = (75, 75)
 board_image = pygame.image.load(
-    r"C:\Users\danie\PycharmProjects\ChessGit\Images\board.png")
+    r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\board.png")
 wking_image = pygame.image.load(
-    r"C:\Users\danie\PycharmProjects\ChessGit\Images\wking.png").convert_alpha()
+    r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wking.png").convert_alpha()
+wqueen_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wqueen.png")
+bking_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\bking.png")
+wpawn_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wpawn.png")
 wking_image = pygame.transform.scale(wking_image, image_constant)
+bking_image = pygame.transform.scale(bking_image, image_constant)
+wqueen_image = pygame.transform.scale(wqueen_image, image_constant)
+wpawn_image = pygame.transform.scale(wpawn_image, image_constant)
 
 board = [[" " for i in range(8)] for i in range(8)]
 print("".join([f"\n{i}" for i in board]))
@@ -27,6 +32,7 @@ print("".join([f"\n{i}" for i in board]))
 def piecethere(xsquare, ysquare):
     for i in ap:
         if i.xpos == xsquare and i.ypos == ysquare and i != item:
+            print(i.name,i.xpos,i.ypos)
             return True
 
     return False
@@ -34,29 +40,40 @@ def piecethere(xsquare, ysquare):
 
 def kingmoves(x, y):
     if x < abs(2) and y < abs(2):
-        return True
+        returner = True
     else:
-        return False
-
+        returner = False
+    return returner
 
 def queenmoves(x, y, startx, starty):
     returner = True
-    if x == y or x == 0 or y == 0:
-        if x == y:
-            for i in range(1, x):
-                if piecethere(startx + i, starty + i):
+    print(x,y)
+    if abs(x) == abs(y) or x == 0 or y == 0:
+        if abs(x) == abs(y):
+            for i in range(1, abs(x)):
+                print(i)
+                print("i am here")
+                if x <0:
+                    vectorx = startx - i
+                elif x > 0:
+                    vectorx = startx + i
+                if y <0:
+                    vectory = starty - i
+                elif y > 0:
+                    vectory = starty + i    
+                if piecethere(vectorx, vectory):
                     returner = False
                     break
                 else:
                     returner = True
-        if y == 0:
+        elif y == 0:
             for i in range(1, x):
                 if piecethere(startx + i, starty):
                     returner = False
                     break
                 else:
                     returner = True
-        if x == 0:
+        elif x == 0:
             for i in range(1, y):
                 if piecethere(startx, starty + i):
                     returner = False
@@ -91,9 +108,9 @@ class Piece:
 
 wp = []
 for i in range(1, 9):
-    wp.append(Piece((f"wp{i}"), i, 7, "w"))
+    wp.append(Piece((f"wp{i}"), i, 7, "w", wpawn_image))
 wp.append(Piece((f"wk"), 4, 8, "w"))
-wp.append(Piece((f"wq"), 5, 8, "w"))
+wp.append(Piece((f"wq"), 5, 8, "w", wqueen_image))
 wp.append(Piece((f"wb1"), 3, 8, "w"))
 wp.append(Piece((f"wb2"), 6, 8, "w"))
 wp.append(Piece((f"wn1"), 2, 8, "w"))
@@ -109,7 +126,7 @@ print("".join([f"\n{i}" for i in board]))
 bp = []
 for i in range(1, 9):
     bp.append(Piece((f"bp{i}"), i, 2, "b"))
-bp.append(Piece((f"bk"), 5, 1, "w"))
+bp.append(Piece((f"bk"), 5, 1, "w", bking_image))
 bp.append(Piece((f"bq"), 4, 1, "w"))
 bp.append(Piece((f"bb1"), 3, 1, "w"))
 bp.append(Piece((f"bb2"), 6, 1, "w"))
@@ -186,7 +203,7 @@ while run:
                 item.placerx = 125 + xsquare * 75
                 item.placery = ysquare * 75
                 for i in ap:
-                    if i.xpos == xsquare and i.ypos == ysquare and i != item:
+                    if i.xpos == xsquare and i.ypos == ysquare and i != item and i.name[0]!=item.name[0]:
                         ap.remove(i)
                 item.xpos = xsquare
                 item.ypos = ysquare
@@ -198,11 +215,12 @@ while run:
                 displacex = abs(newposx - xsquare)
                 displacey = abs(newposy - ysquare)
                 print(item.name)
+                movevalid = True
                 if item.name[1] == "k":
                     movevalid = kingmoves(displacex, displacey)
                 elif item.name[1] == "q":
                     print("AAAA")
-                    movevalid = queenmoves(displacex, displacey, xsquare, ysquare)
+                    movevalid = queenmoves(newposx - xsquare,newposy - ysquare, xsquare, ysquare)
                     print(movevalid)
                 else:
                     movevalid = True
