@@ -1,6 +1,12 @@
 import pygame
 
 # import pygame_menu
+    # TODO: -Checking checking, -checkmate, en passant, castling, promotion, sounds
+    # TODO: -checkmate
+    # TODO: -en passant
+    # TODO: -castling
+    # TODO: - promotion
+    # TODO: - sounds
 
 
 pygame.init()
@@ -10,19 +16,38 @@ white = (255, 255, 255)
 myfont = pygame.font.SysFont("Comic Sans MS", 30)
 image_constant = (75, 75)
 board_image = pygame.image.load(
-    r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\board.png")
+    r"Images\board.png")
 wking_image = pygame.image.load(
-    r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wking.png").convert_alpha()
-wqueen_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wqueen.png")
-bking_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\bking.png")
-wpawn_image = pygame.image.load(r"C:\Users\dangro0809\OneDrive - Highgate School\Highgate school\Year 12\Computer Science\Images\wpawn.png")
+    r"Images\wking.png").convert_alpha()
+wqueen_image = pygame.image.load(r"Images\wqueen.png")
+wbishop_image = pygame.image.load(r"Images\wbishop.png")
+wknight_image = pygame.image.load(r"Images\wknight.png")
+wrook_image = pygame.image.load(r"Images\wrook.png")
+wpawn_image = pygame.image.load(r"Images\wpawn.png")
+
+bking_image = pygame.image.load(r"Images\bking.png")
+bqueen_image = pygame.image.load(r"Images\bqueen.png")
+bbishop_image = pygame.image.load(r"Images\bbishop.png")
+bknight_image = pygame.image.load(r"Images\bknight.png")
+brook_image = pygame.image.load(r"Images\brook.png")
+bpawn_image = pygame.image.load(r"Images\bpawn.png")
+
 wking_image = pygame.transform.scale(wking_image, image_constant)
-bking_image = pygame.transform.scale(bking_image, image_constant)
 wqueen_image = pygame.transform.scale(wqueen_image, image_constant)
+wbishop_image = pygame.transform.scale(wbishop_image, image_constant)
+wknight_image = pygame.transform.scale(wknight_image, image_constant)
+wrook_image = pygame.transform.scale(wrook_image, image_constant)
 wpawn_image = pygame.transform.scale(wpawn_image, image_constant)
 
+bking_image = pygame.transform.scale(bking_image, image_constant)
+bqueen_image = pygame.transform.scale(bqueen_image, image_constant)
+bbishop_image = pygame.transform.scale(bbishop_image, image_constant)
+bknight_image = pygame.transform.scale(bknight_image, image_constant)
+brook_image = pygame.transform.scale(brook_image, image_constant)
+bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
+
 board = [[" " for i in range(8)] for i in range(8)]
-print("".join([f"\n{i}" for i in board]))
+#print("".join([f"\n{i}" for i in board]))
 
 
 # def start_game():
@@ -31,28 +56,44 @@ print("".join([f"\n{i}" for i in board]))
 
 def piecethere(xsquare, ysquare):
     for i in ap:
-        if i.xpos == xsquare and i.ypos == ysquare and i != item:
-            print(i.name,i.xpos,i.ypos)
+        if i.xpos == xsquare and i.ypos == ysquare and i!=item:
+            #print(item.name)
+            #print(i.name,i.xpos,i.ypos)
             return True
 
     return False
 
+def piecethereexclude(xsquare, ysquare):
+    print("I AM HERE")
+    for i in ap:
+        if i.xpos == xsquare and i.ypos == ysquare and i.name[0]!=item.name[0]:
+            print(item.name)
+            print(i.name,i.xpos,i.ypos)
+            return True
+    #print("i shall return false")
+    return False
 
-def kingmoves(x, y):
-    if x < abs(2) and y < abs(2):
+
+def kingmoves(x, y, item):
+    #print(f"asdasd {item.xpos, item.ypos}")
+    #print(x,y)
+    if abs(x) < 2 and abs(y) < 2 and not piecethereexclude(item.xpos+x,item.ypos+y):
+        #print("why am i here")
         returner = True
     else:
         returner = False
+        #print("am i here")
     return returner
 
 def queenmoves(x, y, startx, starty):
     returner = True
-    print(x,y)
+    #print(x,y)
+    #print(startx,starty)
     if abs(x) == abs(y) or x == 0 or y == 0:
         if abs(x) == abs(y):
-            for i in range(1, abs(x)):
-                print(i)
-                print("i am here")
+            for i in range(0, abs(x)+1):
+                #print(i)
+                #print("i am here")
                 if x <0:
                     vectorx = startx - i
                 elif x > 0:
@@ -60,22 +101,41 @@ def queenmoves(x, y, startx, starty):
                 if y <0:
                     vectory = starty - i
                 elif y > 0:
-                    vectory = starty + i    
-                if piecethere(vectorx, vectory):
+                    vectory = starty + i
+                if abs(x) == i:
+                    print("passed first")
+                if abs(x) == i and piecethereexclude(vectorx,vectory):
+                    print("yooooo")
+                    return True
+                elif piecethere(vectorx, vectory):
                     returner = False
-                    break
+                    return returner
                 else:
                     returner = True
         elif y == 0:
-            for i in range(1, x):
-                if piecethere(startx + i, starty):
+            for i in range(1, abs(x)+1):
+                #print(f"look {i}")
+                if x > 0:
+                    vectorx = startx + i
+                if x < 0:
+                    vectorx = startx - i
+                if abs(x) == i and piecethereexclude(vectorx,starty):
+                    return True
+                elif piecethere(vectorx, starty):
                     returner = False
                     break
                 else:
                     returner = True
         elif x == 0:
-            for i in range(1, y):
-                if piecethere(startx, starty + i):
+
+            for i in range(1, abs(y)+1):
+                if y > 0:
+                    vectory = starty + i
+                if y < 1:
+                    vectory = starty - i
+                if abs(y) == i and piecethereexclude(startx,vectory):
+                    return True
+                elif piecethere(startx, vectory):
                     returner = False
                     break
                 else:
@@ -83,6 +143,76 @@ def queenmoves(x, y, startx, starty):
     else:
         returner = False
     return returner
+
+def bishop_moves(x, y, startx, starty):
+    if abs(x) == abs(y):
+        for i in range(0, abs(x) + 1):
+            # print(i)
+            # print("i am here")
+            if x < 0:
+                vectorx = startx - i
+            elif x > 0:
+                vectorx = startx + i
+            if y < 0:
+                vectory = starty - i
+            elif y > 0:
+                vectory = starty + i
+
+            if abs(x) == i and piecethereexclude(vectorx, vectory):
+                return True
+            elif piecethere(vectorx, vectory):
+                returner = False
+                return returner
+            else:
+                returner = True
+    else:
+        returner = False
+    return returner
+
+def knight_moves(x, y, startx, starty):
+    print(x,y)
+    print(startx, starty)
+    if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
+        print("got here")
+        if piecethereexclude(startx + x, starty + y) or not piecethere(startx + x, starty + y):
+            return True
+    else:
+        return False
+
+def rook_moves(x, y, startx, starty):
+    if x == 0 or y == 0:
+        if y == 0:
+            for i in range(1, abs(x)+1):
+                #print(f"look {i}")
+                if x > 0:
+                    vectorx = startx + i
+                if x < 0:
+                    vectorx = startx - i
+                if abs(x) == i and piecethereexclude(vectorx,starty):
+                    return True
+                elif piecethere(vectorx, starty):
+                    returner = False
+                    break
+                else:
+                    returner = True
+        elif x == 0:
+
+            for i in range(1, abs(y)+1):
+                if y > 0:
+                    vectory = starty + i
+                if y < 1:
+                    vectory = starty - i
+                if abs(y) == i and piecethereexclude(startx,vectory):
+                    return True
+                elif piecethere(startx, vectory):
+                    returner = False
+                    break
+                else:
+                    returner = True
+    else:
+        returner = False
+    return returner
+
 
 
 class Piece:
@@ -109,14 +239,14 @@ class Piece:
 wp = []
 for i in range(1, 9):
     wp.append(Piece((f"wp{i}"), i, 7, "w", wpawn_image))
-wp.append(Piece((f"wk"), 4, 8, "w"))
+wp.append(Piece((f"wk"), 4, 8, "w", wking_image))
 wp.append(Piece((f"wq"), 5, 8, "w", wqueen_image))
-wp.append(Piece((f"wb1"), 3, 8, "w"))
-wp.append(Piece((f"wb2"), 6, 8, "w"))
-wp.append(Piece((f"wn1"), 2, 8, "w"))
-wp.append(Piece((f"wn2"), 7, 8, "w"))
-wp.append(Piece((f"wr1"), 1, 8, "w"))
-wp.append(Piece((f"wr2"), 8, 8, "w"))
+wp.append(Piece((f"wb1"), 3, 8, "w", wbishop_image))
+wp.append(Piece((f"wb2"), 6, 8, "w", wbishop_image))
+wp.append(Piece((f"wn1"), 2, 8, "w", wknight_image))
+wp.append(Piece((f"wn2"), 7, 8, "w", wknight_image))
+wp.append(Piece((f"wr1"), 1, 8, "w", wrook_image))
+wp.append(Piece((f"wr2"), 8, 8, "w", wrook_image))
 for i in wp:
     (i.info())
     i.place()
@@ -125,15 +255,15 @@ print("".join([f"\n{i}" for i in board]))
 
 bp = []
 for i in range(1, 9):
-    bp.append(Piece((f"bp{i}"), i, 2, "b"))
+    bp.append(Piece((f"bp{i}"), i, 2, "b", bpawn_image))
 bp.append(Piece((f"bk"), 5, 1, "w", bking_image))
-bp.append(Piece((f"bq"), 4, 1, "w"))
-bp.append(Piece((f"bb1"), 3, 1, "w"))
-bp.append(Piece((f"bb2"), 6, 1, "w"))
-bp.append(Piece((f"bn1"), 2, 1, "w"))
-bp.append(Piece((f"bn2"), 7, 1, "w"))
-bp.append(Piece((f"br1"), 1, 1, "w"))
-bp.append(Piece((f"br2"), 8, 1, "w"))
+bp.append(Piece((f"bq"), 4, 1, "w", bqueen_image))
+bp.append(Piece((f"bb1"), 3, 1, "w", bbishop_image))
+bp.append(Piece((f"bb2"), 6, 1, "w", bbishop_image))
+bp.append(Piece((f"bn1"), 2, 1, "w", bknight_image))
+bp.append(Piece((f"bn2"), 7, 1, "w", bknight_image))
+bp.append(Piece((f"br1"), 1, 1, "w", brook_image))
+bp.append(Piece((f"br2"), 8, 1, "w", brook_image))
 
 for i in bp:
     (i.info())
@@ -199,38 +329,55 @@ while run:
 
             try:
                 x, y = pygame.mouse.get_pos()
-                xsquare, ysquare = snapper(x, y)
+                xsquare, ysquare = snapper(x, y) #xsquare and xsquare are the squares the piece is trying to be placed on
                 item.placerx = 125 + xsquare * 75
                 item.placery = ysquare * 75
-                for i in ap:
-                    if i.xpos == xsquare and i.ypos == ysquare and i != item and i.name[0]!=item.name[0]:
-                        ap.remove(i)
-                item.xpos = xsquare
-                item.ypos = ysquare
-                if xsquare == 0 or ysquare == 0:
-                    item.placerx = 125 + newposx * 75
-                    item.xpos = newposx
-                    item.placery = newposy * 75
-                    item.ypos = newposy
-                displacex = abs(newposx - xsquare)
+                print(f"what{newposx,newposy}")
+                #if xsquare == 0 or ysquare == 0:
+                    #item.placerx = 125 + newposx * 75
+                    #item.xpos = newposx
+                    #item.placery = newposy * 75
+                    #item.ypos = newposy
+                displacex = abs(newposx - xsquare)  #displacex and displacey represent absolute vector
                 displacey = abs(newposy - ysquare)
+                print(f"YYYY {xsquare,ysquare}")
                 print(item.name)
                 movevalid = True
                 if item.name[1] == "k":
-                    movevalid = kingmoves(displacex, displacey)
+                    movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item)
                 elif item.name[1] == "q":
                     print("AAAA")
-                    movevalid = queenmoves(newposx - xsquare,newposy - ysquare, xsquare, ysquare)
+                    movevalid = queenmoves(-(newposx - xsquare),ysquare - newposy, newposx, newposy)
                     print(movevalid)
+                elif item.name[1] == "b":
+                    movevalid = bishop_moves(-(newposx - xsquare),ysquare - newposy, newposx, newposy)
+                elif item.name[1] == "n":
+                    movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
+                elif item.name[1] == "r":
+                    movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
                 else:
                     movevalid = True
-
+                print(f"{movevalid} move valid")
                 if not movevalid:
                     item.placerx = 125 + newposx * 75
                     item.xpos = newposx
                     item.placery = newposy * 75
                     item.ypos = newposy
                 print(item.xpos,item.ypos)
+                for i in wp:
+                    print(i.name,i.xpos,i.ypos)
+                if movevalid:
+                    print("hello am here")
+                    print(xsquare,ysquare)
+                    for i in ap:
+                        if i.xpos == xsquare and i.ypos == ysquare and i != item and i.name[0]!=item.name[0]:
+                            print(f"am also here {i.name}")
+                            ap.remove(i)
+                    item.xpos = xsquare
+                    item.ypos = ysquare
+                    print(f"updated {item.xpos, item.ypos}")
+                for i in wp:
+                    print(i.name,i.xpos,i.ypos)
 
 
             except AttributeError:
