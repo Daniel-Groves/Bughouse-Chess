@@ -14,6 +14,7 @@ screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 white = (255, 255, 255)
 image_constant = (75, 75)
+move = True   #move being true means white to move
 board_image = pygame.image.load(
     r"Images\board.png")
 wking_image = pygame.image.load(
@@ -52,18 +53,64 @@ board = [[" " for i in range(8)] for i in range(8)]
 # def start_game():
 # menu.add.text_input(board)
 
+def check_checker(wp, bp, wking, bking):
+    if move:
+        pieces = bp
+        king = wking
+    else:
+        pieces = wp
+        king = bking
+    for item in pieces:
+        if item.name[1] == "k":
+            movevalid = False
+        elif item.name[1] == "q":
+            print("checking AAAA")
+            print(item.name)
+            print(king.xpos, king.ypos)
+            print((item.xpos - king.xpos), item.ypos - king.ypos)
+            movevalid = queenmoves(king.xpos - item.xpos, king.ypos - item.ypos, item.xpos, item.ypos)
+            print(f"valid? {movevalid}")
+            if movevalid:
+                return movevalid
+        elif item.name[1] == "b":
+            movevalid = bishop_moves(king.xpos - item.xpos, king.ypos - item.ypos, king.xpos, king.ypos)
+            if movevalid:
+                return movevalid
+        elif item.name[1] == "n":
+            movevalid = knight_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos)
+            if movevalid:
+                return movevalid
+        elif item.name[1] == "r":
+            movevalid = rook_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos)
+            if movevalid:
+                return movevalid
+        elif item.name[0:2] == "wp":
+            movevalid = white_pawn_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos, item.move_num)
+            if movevalid:
+                return movevalid
+        elif item.name[0:2] == "bp":
+            movevalid = black_pawn_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos, item.move_num)
+            if movevalid:
+                return movevalid
+        else:
+            return False
+
+
 
 def piecethere(xsquare, ysquare):
+    print("I AM HERE")
+    print(item.name)
     for i in ap:
         if i.xpos == xsquare and i.ypos == ysquare and i!=item:
-            #print(item.name)
-            #print(i.name,i.xpos,i.ypos)
+            print(f"squares {xsquare, ysquare}")
+            print(item.name)
+            print(i.name,i.xpos,i.ypos)
             return True
 
     return False
 
 def piecethereexclude(xsquare, ysquare):
-    print("I AM HERE")
+
     for i in ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0]!=item.name[0]:
             print(item.name)
@@ -86,13 +133,14 @@ def kingmoves(x, y, item):
 
 def queenmoves(x, y, startx, starty):
     returner = True
-    #print(x,y)
-    #print(startx,starty)
+    print(f"vactors {x,y}")
+    print(startx,starty)
     if abs(x) == abs(y) or x == 0 or y == 0:
         if abs(x) == abs(y):
             for i in range(0, abs(x)+1):
-                #print(i)
-                #print("i am here")
+                print(item.name)
+                print(i)
+                print("i am here")
                 if x <0:
                     vectorx = startx - i
                 elif x > 0:
@@ -107,7 +155,9 @@ def queenmoves(x, y, startx, starty):
                     print("yooooo")
                     return True
                 elif piecethere(vectorx, vectory):
+                    print("we aer her")
                     returner = False
+                    print(f"here {returner}")
                     return returner
                 else:
                     returner = True
@@ -257,8 +307,9 @@ class Piece:
 wp = []
 for i in range(1, 9):
     wp.append(Piece((f"wp{i}"), i, 7, "w", wpawn_image))
-wp.append(Piece((f"wk"), 4, 8, "w", wking_image))
-wp.append(Piece((f"wq"), 5, 8, "w", wqueen_image))
+wking = Piece((f"wk"), 5, 8, "w", wking_image)
+wp.append(wking)
+wp.append(Piece((f"wq"), 4, 8, "w", wqueen_image))
 wp.append(Piece((f"wb1"), 3, 8, "w", wbishop_image))
 wp.append(Piece((f"wb2"), 6, 8, "w", wbishop_image))
 wp.append(Piece((f"wn1"), 2, 8, "w", wknight_image))
@@ -266,15 +317,15 @@ wp.append(Piece((f"wn2"), 7, 8, "w", wknight_image))
 wp.append(Piece((f"wr1"), 1, 8, "w", wrook_image))
 wp.append(Piece((f"wr2"), 8, 8, "w", wrook_image))
 for i in wp:
-    (i.info())
-    i.place()
+    print(i)
 
 print("".join([f"\n{i}" for i in board]))
 
 bp = []
 for i in range(1, 9):
     bp.append(Piece((f"bp{i}"), i, 2, "b", bpawn_image))
-bp.append(Piece((f"bk"), 5, 1, "w", bking_image))
+bking = (Piece((f"bk"), 5, 1, "w", bking_image))
+bp.append(bking)
 bp.append(Piece((f"bq"), 4, 1, "w", bqueen_image))
 bp.append(Piece((f"bb1"), 3, 1, "w", bbishop_image))
 bp.append(Piece((f"bb2"), 6, 1, "w", bbishop_image))
@@ -319,8 +370,8 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     for count, value in enumerate(board):
-        thing = myfont.render((" ".join(value)), True, (0, 0, 0))
-        screen.blit(thing, (250, 100 + (30 * count)))
+        #thing = myfont.render((" ".join(value)), True, (0, 0, 0))
+        #screen.blit(thing, (250, 100 + (30 * count)))
         screen.blit(board_image, (200, 75))
     for i in ap:
         screen.blit(i.image, (i.placerx, i.placery))
@@ -361,6 +412,12 @@ while run:
                 print(f"YYYY {xsquare,ysquare}")
                 print(item.name)
                 movevalid = True
+                if item.name[0] == "w" and move == True:
+                    turn = True
+                elif item.name[0] == "b" and move == False:
+                    turn = True
+                else:
+                    turn = False
                 if item.name[1] == "k":
                     movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item)
                 elif item.name[1] == "q":
@@ -378,13 +435,14 @@ while run:
                     if movevalid:
                         item.move_num += 1
                 elif item.name[0:2] == "bp":
-                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num)
+                    print(f"check {check_checker(wp,bp,wking,bking)}")
+                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num) and not check_checker(wp,bp,wking,bking)
                     if movevalid:
                         item.move_num += 1
                 else:
                     movevalid = True
                 print(f"{movevalid} move valid")
-                if not movevalid:
+                if not movevalid or not turn:
                     item.placerx = 125 + newposx * 75
                     item.xpos = newposx
                     item.placery = newposy * 75
@@ -392,17 +450,24 @@ while run:
                 print(item.xpos,item.ypos)
                 for i in wp:
                     print(i.name,i.xpos,i.ypos)
-                if movevalid:
+                if movevalid and turn:
+                    move = not move
                     print("hello am here")
                     print(xsquare,ysquare)
                     for i in ap:
-                        if i.xpos == xsquare and i.ypos == ysquare and i != item and i.name[0]!=item.name[0]:
+                        if i.xpos == xsquare and i.ypos == ysquare and i.name[0]!=item.name[0]:
                             print(f"am also here {i.name}")
                             ap.remove(i)
+                            if i.name[0]=="w":
+                                wp.remove(i)
+                            else:
+                                bp.remove(i)
                     item.xpos = xsquare
                     item.ypos = ysquare
                     print(f"updated {item.xpos, item.ypos}")
                 for i in wp:
+                    print(i.name,i.xpos,i.ypos)
+                for i in bp:
                     print(i.name,i.xpos,i.ypos)
 
 
