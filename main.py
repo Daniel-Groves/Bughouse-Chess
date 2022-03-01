@@ -60,36 +60,39 @@ def check_checker(wp, bp, wking, bking):
     else:
         pieces = wp
         king = bking
-    for item in pieces:
-        if item.name[1] == "k":
+    global piece
+    for piece in pieces:
+        if piece.name[1] == "k":
             movevalid = False
-        elif item.name[1] == "q":
+        elif piece.name[1] == "q":
             print("checking AAAA")
-            print(item.name)
+            print(piece.name)
             print(king.xpos, king.ypos)
-            print((item.xpos - king.xpos), item.ypos - king.ypos)
-            movevalid = queenmoves(king.xpos - item.xpos, king.ypos - item.ypos, item.xpos, item.ypos)
+            print((piece.xpos - king.xpos), piece.ypos - king.ypos)
+            print(f"AAAAAAAAA {piece.name}")
+            movevalid = queenmoves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             print(f"valid? {movevalid}")
             if movevalid:
+                print("this is good")
                 return movevalid
-        elif item.name[1] == "b":
-            movevalid = bishop_moves(king.xpos - item.xpos, king.ypos - item.ypos, king.xpos, king.ypos)
+        elif piece.name[1] == "b":
+            movevalid = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)
             if movevalid:
                 return movevalid
-        elif item.name[1] == "n":
-            movevalid = knight_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos)
+        elif piece.name[1] == "n":
+            movevalid = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if movevalid:
                 return movevalid
-        elif item.name[1] == "r":
-            movevalid = rook_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos)
+        elif piece.name[1] == "r":
+            movevalid = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if movevalid:
                 return movevalid
-        elif item.name[0:2] == "wp":
-            movevalid = white_pawn_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos, item.move_num)
+        elif piece.name[0:2] == "wp":
+            movevalid = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
             if movevalid:
                 return movevalid
-        elif item.name[0:2] == "bp":
-            movevalid = black_pawn_moves(item.xpos - king.xpos, item.ypos - king.ypos, king.xpos, king.ypos, item.move_num)
+        elif piece.name[0:2] == "bp":
+            movevalid = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
             if movevalid:
                 return movevalid
         else:
@@ -97,23 +100,23 @@ def check_checker(wp, bp, wking, bking):
 
 
 
-def piecethere(xsquare, ysquare):
+def piecethere(xsquare, ysquare, compare):
     print("I AM HERE")
-    print(item.name)
+    print(xsquare,ysquare)
     for i in ap:
-        if i.xpos == xsquare and i.ypos == ysquare and i!=item:
+        if i.xpos == xsquare and i.ypos == ysquare and i!=compare:
             print(f"squares {xsquare, ysquare}")
-            print(item.name)
+            print(compare.name)
             print(i.name,i.xpos,i.ypos)
             return True
 
     return False
 
-def piecethereexclude(xsquare, ysquare):
+def piecethereexclude(xsquare, ysquare, compare):
 
     for i in ap:
-        if i.xpos == xsquare and i.ypos == ysquare and i.name[0]!=item.name[0]:
-            print(item.name)
+        if i.xpos == xsquare and i.ypos == ysquare and i.name[0]!=compare.name[0]:
+            print(compare.name)
             print(i.name,i.xpos,i.ypos)
             return True
     #print("i shall return false")
@@ -123,7 +126,7 @@ def piecethereexclude(xsquare, ysquare):
 def kingmoves(x, y, item):
     #print(f"asdasd {item.xpos, item.ypos}")
     #print(x,y)
-    if abs(x) < 2 and abs(y) < 2 and not piecethereexclude(item.xpos+x,item.ypos+y):
+    if abs(x) < 2 and abs(y) < 2 and not piecethere(item.xpos+x,item.ypos+y,item):
         #print("why am i here")
         returner = True
     else:
@@ -131,14 +134,15 @@ def kingmoves(x, y, item):
         #print("am i here")
     return returner
 
-def queenmoves(x, y, startx, starty):
+def queenmoves(x, y, startx, starty, queen):
+    print(f"ASHDASKDKJASDKJASDK {queen.name}")
     returner = True
     print(f"vactors {x,y}")
     print(startx,starty)
     if abs(x) == abs(y) or x == 0 or y == 0:
         if abs(x) == abs(y):
             for i in range(0, abs(x)+1):
-                print(item.name)
+                print(queen.name)
                 print(i)
                 print("i am here")
                 if x <0:
@@ -149,12 +153,13 @@ def queenmoves(x, y, startx, starty):
                     vectory = starty - i
                 elif y > 0:
                     vectory = starty + i
+                print(f"FFFF {vectorx, vectory}")
                 if abs(x) == i:
                     print("passed first")
-                if abs(x) == i and piecethereexclude(vectorx,vectory):
+                if abs(x) == i and piecethereexclude(vectorx,vectory,queen):
                     print("yooooo")
                     return True
-                elif piecethere(vectorx, vectory):
+                elif piecethere(vectorx, vectory, queen):
                     print("we aer her")
                     returner = False
                     print(f"here {returner}")
@@ -168,9 +173,9 @@ def queenmoves(x, y, startx, starty):
                     vectorx = startx + i
                 if x < 0:
                     vectorx = startx - i
-                if abs(x) == i and piecethereexclude(vectorx,starty):
+                if abs(x) == i and piecethereexclude(vectorx,starty, queen):
                     return True
-                elif piecethere(vectorx, starty):
+                elif piecethere(vectorx, starty, queen):
                     returner = False
                     break
                 else:
@@ -182,9 +187,9 @@ def queenmoves(x, y, startx, starty):
                     vectory = starty + i
                 if y < 1:
                     vectory = starty - i
-                if abs(y) == i and piecethereexclude(startx,vectory):
+                if abs(y) == i and piecethereexclude(startx,vectory, queen):
                     return True
-                elif piecethere(startx, vectory):
+                elif piecethere(startx, vectory, queen):
                     returner = False
                     break
                 else:
@@ -193,7 +198,7 @@ def queenmoves(x, y, startx, starty):
         returner = False
     return returner
 
-def bishop_moves(x, y, startx, starty):
+def bishop_moves(x, y, startx, starty, bishop):
     if abs(x) == abs(y):
         for i in range(0, abs(x) + 1):
             # print(i)
@@ -207,9 +212,9 @@ def bishop_moves(x, y, startx, starty):
             elif y > 0:
                 vectory = starty + i
 
-            if abs(x) == i and piecethereexclude(vectorx, vectory):
+            if abs(x) == i and piecethereexclude(vectorx, vectory, bishop):
                 return True
-            elif piecethere(vectorx, vectory):
+            elif piecethere(vectorx, vectory, bishop):
                 returner = False
                 return returner
             else:
@@ -218,17 +223,17 @@ def bishop_moves(x, y, startx, starty):
         returner = False
     return returner
 
-def knight_moves(x, y, startx, starty):
+def knight_moves(x, y, startx, starty, knight):
     print(x,y)
     print(startx, starty)
     if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
         print("got here")
-        if piecethereexclude(startx + x, starty + y) or not piecethere(startx + x, starty + y):
+        if piecethereexclude(startx + x, starty + y, knight) or not piecethere(startx + x, starty + y, knight):
             return True
     else:
         return False
 
-def rook_moves(x, y, startx, starty):
+def rook_moves(x, y, startx, starty, rook):
     if x == 0 or y == 0:
         if y == 0:
             for i in range(1, abs(x)+1):
@@ -237,9 +242,9 @@ def rook_moves(x, y, startx, starty):
                     vectorx = startx + i
                 if x < 0:
                     vectorx = startx - i
-                if abs(x) == i and piecethereexclude(vectorx,starty):
+                if abs(x) == i and piecethereexclude(vectorx,starty, rook):
                     return True
-                elif piecethere(vectorx, starty):
+                elif piecethere(vectorx, starty, rook):
                     returner = False
                     break
                 else:
@@ -251,9 +256,9 @@ def rook_moves(x, y, startx, starty):
                     vectory = starty + i
                 if y < 1:
                     vectory = starty - i
-                if abs(y) == i and piecethereexclude(startx,vectory):
+                if abs(y) == i and piecethereexclude(startx,vectory, rook):
                     return True
-                elif piecethere(startx, vectory):
+                elif piecethere(startx, vectory, rook):
                     returner = False
                     break
                 else:
@@ -262,22 +267,22 @@ def rook_moves(x, y, startx, starty):
         returner = False
     return returner
 
-def white_pawn_moves(x, y, startx, starty, first):
-    if x == 0 and y == -1 and not piecethere(startx, starty - 1):
+def white_pawn_moves(x, y, startx, starty, first, wpa):
+    if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
         return True
-    elif abs(x)==1 and y == -1 and piecethereexclude(startx + x, starty - 1):
+    elif abs(x)==1 and y == -1 and piecethereexclude(startx + x, starty - 1, wpa):
         return True
-    elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1) and first == 0:
+    elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
         return True
     else:
         return False
 
-def black_pawn_moves(x, y, startx, starty, first):
-    if x == 0 and y == 1 and not piecethere(startx, starty + 1):
+def black_pawn_moves(x, y, startx, starty, first, bpa):
+    if x == 0 and y == 1 and not piecethere(startx, starty + 1, bpa):
         return True
-    elif abs(x)==1 and y == 1 and piecethereexclude(startx + x, starty + 1):
+    elif abs(x)==1 and y == 1 and piecethereexclude(startx + x, starty + 1, bpa):
         return True
-    elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1) and first == 0:
+    elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1, bpa) and first == 0:
         return True
     else:
         return False
@@ -419,24 +424,29 @@ while run:
                 else:
                     turn = False
                 if item.name[1] == "k":
-                    movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item)
+                    movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[1] == "q":
                     print("AAAA")
-                    movevalid = queenmoves(-(newposx - xsquare),ysquare - newposy, newposx, newposy)
+                    movevalid = queenmoves(-(newposx - xsquare),ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                     print(movevalid)
                 elif item.name[1] == "b":
-                    movevalid = bishop_moves(-(newposx - xsquare),ysquare - newposy, newposx, newposy)
+                    movevalid = bishop_moves(-(newposx - xsquare),ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[1] == "n":
-                    movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
+                    movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[1] == "r":
-                    movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
+                    movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[0:2] == "wp":
-                    movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num)
+                    movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item) and not check_checker(wp,bp,wking,bking)
                     if movevalid:
                         item.move_num += 1
                 elif item.name[0:2] == "bp":
                     print(f"check {check_checker(wp,bp,wking,bking)}")
-                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num) and not check_checker(wp,bp,wking,bking)
+                    x = item
+                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item) and not check_checker(wp,bp,wking,bking)
+                    item = x
+                    print(f"check {check_checker(wp,bp,wking,bking)}")
+                    print(movevalid)
+                    print(item.name)
                     if movevalid:
                         item.move_num += 1
                 else:
@@ -448,8 +458,8 @@ while run:
                     item.placery = newposy * 75
                     item.ypos = newposy
                 print(item.xpos,item.ypos)
-                for i in wp:
-                    print(i.name,i.xpos,i.ypos)
+                #for i in wp:
+                    #print(i.name,i.xpos,i.ypos)
                 if movevalid and turn:
                     move = not move
                     print("hello am here")
@@ -465,10 +475,10 @@ while run:
                     item.xpos = xsquare
                     item.ypos = ysquare
                     print(f"updated {item.xpos, item.ypos}")
-                for i in wp:
-                    print(i.name,i.xpos,i.ypos)
-                for i in bp:
-                    print(i.name,i.xpos,i.ypos)
+                #for i in wp:
+                    #print(i.name,i.xpos,i.ypos)
+                #for i in bp:
+                    #print(i.name,i.xpos,i.ypos)
 
 
             except AttributeError:
