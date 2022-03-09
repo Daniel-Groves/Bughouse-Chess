@@ -417,6 +417,20 @@ while run:
                 print(f"YYYY {xsquare,ysquare}")
                 print(item.name)
                 movevalid = True
+                tempx = item.xpos
+                tempy = item.ypos
+                item.xpos = xsquare
+                item.ypos = ysquare
+                for i in ap:
+                    if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+                        print(f"am also here {i.name}")
+                        ap.remove(i)
+                        if i.name[0] == "w":
+                            wp.remove(i)
+                        else:
+                            bp.remove(i)
+                            print("removed")
+                        tempitem = i
                 if item.name[0] == "w" and move == True:
                     turn = True
                 elif item.name[0] == "b" and move == False:
@@ -453,10 +467,19 @@ while run:
                     movevalid = True
                 print(f"{movevalid} move valid")
                 if not movevalid or not turn:
-                    item.placerx = 125 + newposx * 75
-                    item.xpos = newposx
-                    item.placery = newposy * 75
-                    item.ypos = newposy
+                    print("HOLA")
+                    print(tempx,tempy)
+                    print(item.name)
+                    item.placerx = 125 + tempx * 75
+                    item.xpos = tempx
+                    item.placery = tempy * 75
+                    item.ypos = tempy
+                    if i:
+                        ap.append(tempitem)
+                        if tempitem.name[0] == "w":
+                            wp.append(tempitem)
+                        else:
+                            bp.append(tempitem)
                 print(item.xpos,item.ypos)
                 #for i in wp:
                     #print(i.name,i.xpos,i.ypos)
@@ -472,8 +495,8 @@ while run:
                                 wp.remove(i)
                             else:
                                 bp.remove(i)
-                    item.xpos = xsquare
-                    item.ypos = ysquare
+                    #item.xpos = tempx
+                    #item.ypos = tempy
                     print(f"updated {item.xpos, item.ypos}")
                 #for i in wp:
                     #print(i.name,i.xpos,i.ypos)
