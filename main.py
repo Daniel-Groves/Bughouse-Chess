@@ -122,6 +122,13 @@ def piecethereexclude(xsquare, ysquare, compare):
     #print("i shall return false")
     return False
 
+def takenpiecechecker(xsquare, ysquare, compare):
+    if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name == compare:
+        print("TRUEUEE")
+        return True
+    else:
+        takenpiece = "a"
+        return False
 
 def kingmoves(x, y, item):
     #print(f"asdasd {item.xpos, item.ypos}")
@@ -268,9 +275,12 @@ def rook_moves(x, y, startx, starty, rook):
     return returner
 
 def white_pawn_moves(x, y, startx, starty, first, wpa):
+    print("ASDHIASDH")
+    print(x,y)
     if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
         return True
-    elif abs(x)==1 and y == -1 and piecethereexclude(startx + x, starty - 1, wpa):
+    elif abs(x)==1 and y == -1 and takenpiecechecker(startx + x, starty - 1, wpa):
+        "asghdasd"
         return True
     elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
         return True
@@ -403,7 +413,7 @@ while run:
 
             try:
                 x, y = pygame.mouse.get_pos()
-                xsquare, ysquare = snapper(x, y) #xsquare and xsquare are the squares the piece is trying to be placed on
+                xsquare, ysquare = snapper(x, y) #xsquare and ysquare are the squares the piece is trying to be placed on
                 item.placerx = 125 + xsquare * 75
                 item.placery = ysquare * 75
                 print(f"what{newposx,newposy}")
@@ -425,6 +435,8 @@ while run:
                     if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
                         print(f"am also here {i.name}")
                         ap.remove(i)
+                        takenpiece= i
+                        print(takenpiece)
                         if i.name[0] == "w":
                             wp.remove(i)
                         else:
