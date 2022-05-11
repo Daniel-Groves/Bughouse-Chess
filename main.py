@@ -54,47 +54,50 @@ board = [[" " for i in range(8)] for i in range(8)]
 # menu.add.text_input(board)
 
 def check_checker(wp, bp, wking, bking):
+    print(f"move {move}")
+    print(f"turn {turn}")
     if move:
         pieces = bp
         king = wking
+        print("TRUE")
     else:
         pieces = wp
         king = bking
     global piece
     for piece in pieces:
         if piece.name[1] == "k":
-            movevalid = False
+            checktake = False
         elif piece.name[1] == "q":
             print("checking AAAA")
             print(piece.name)
             print(king.xpos, king.ypos)
             print((piece.xpos - king.xpos), piece.ypos - king.ypos)
             print(f"AAAAAAAAA {piece.name}")
-            movevalid = queenmoves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
-            print(f"valid? {movevalid}")
-            if movevalid:
+            checktake = queenmoves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
+            print(f"valid? {checktake}")
+            if checktake:
                 print("this is good")
-                return movevalid
+                return checktake
         elif piece.name[1] == "b":
-            movevalid = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)
-            if movevalid:
-                return movevalid
+            checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)
+            if checktake:
+                return checktake
         elif piece.name[1] == "n":
-            movevalid = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
-            if movevalid:
-                return movevalid
+            checktake = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
+            if checktake:
+                return checktake
         elif piece.name[1] == "r":
-            movevalid = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
-            if movevalid:
-                return movevalid
+            checktake = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
+            if checktake:
+                return checktake
         elif piece.name[0:2] == "wp":
-            movevalid = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
-            if movevalid:
-                return movevalid
+            checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
+            if checktake:
+                return checktake
         elif piece.name[0:2] == "bp":
-            movevalid = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
-            if movevalid:
-                return movevalid
+            checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
+            if checktake:
+                return checktake
         else:
             return False
 
@@ -278,19 +281,23 @@ def white_pawn_moves(x, y, startx, starty, first, wpa):
     print("ASDHIASDH")
     print(x,y)
     if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
+        print("finished")
         return True
     elif abs(x)==1 and y == -1 and takenpiecechecker(startx + x, starty - 1, wpa):
         "asghdasd"
+        print("finished")
         return True
     elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
+        print("finished")
         return True
     else:
+        print("finished bad")
         return False
 
 def black_pawn_moves(x, y, startx, starty, first, bpa):
     if x == 0 and y == 1 and not piecethere(startx, starty + 1, bpa):
         return True
-    elif abs(x)==1 and y == 1 and piecethereexclude(startx + x, starty + 1, bpa):
+    elif abs(x)==1 and y == 1 and takenpiecechecker(startx + x, starty + 1, bpa):
         return True
     elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1, bpa) and first == 0:
         return True
@@ -443,12 +450,15 @@ while run:
                             bp.remove(i)
                             print("removed")
                         tempitem = i
+                print("hello", item.name[0])
                 if item.name[0] == "w" and move == True:
                     turn = True
                 elif item.name[0] == "b" and move == False:
                     turn = True
                 else:
                     turn = False
+                print(move)
+                print(turn)
                 if item.name[1] == "k":
                     movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[1] == "q":
@@ -465,6 +475,8 @@ while run:
                     movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item) and not check_checker(wp,bp,wking,bking)
                     if movevalid:
                         item.move_num += 1
+                        tempitem = None
+                        print("movevalid")
                 elif item.name[0:2] == "bp":
                     print(f"check {check_checker(wp,bp,wking,bking)}")
                     x = item
@@ -475,6 +487,7 @@ while run:
                     print(item.name)
                     if movevalid:
                         item.move_num += 1
+                        tempitem = None
                 else:
                     movevalid = True
                 print(f"{movevalid} move valid")
@@ -486,7 +499,8 @@ while run:
                     item.xpos = tempx
                     item.placery = tempy * 75
                     item.ypos = tempy
-                    if i:
+                    if tempitem:
+                        print("WHYYWYEHA")
                         ap.append(tempitem)
                         if tempitem.name[0] == "w":
                             wp.append(tempitem)
