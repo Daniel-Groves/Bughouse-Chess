@@ -91,7 +91,7 @@ def check_checker(wp, bp, wking, bking):
             if checktake:
                 return checktake
         elif piece.name[0:2] == "wp":
-            checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
+            checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece,takenpiece)
             if checktake:
                 return checktake
         elif piece.name[0:2] == "bp":
@@ -122,15 +122,18 @@ def piecethereexclude(xsquare, ysquare, compare):
             print(compare.name)
             print(i.name,i.xpos,i.ypos)
             return True
-    #print("i shall return false")
+    print("i shall return false")
     return False
 
-def takenpiecechecker(xsquare, ysquare, compare):
-    if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name == compare:
+def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
+    print(xsquare, ysquare, compare.name)
+    print(takenpiece.name, takenpiece.xpos, takenpiece.ypos)
+    if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name != compare.name:
         print("TRUEUEE")
         return True
     else:
-        takenpiece = "a"
+        print("FALSE")
+        takenpiece = None
         return False
 
 def kingmoves(x, y, item):
@@ -277,14 +280,15 @@ def rook_moves(x, y, startx, starty, rook):
         returner = False
     return returner
 
-def white_pawn_moves(x, y, startx, starty, first, wpa):
+def white_pawn_moves(x, y, startx, starty, first, wpa, takenpiece):
     print("ASDHIASDH")
     print(x,y)
+    print("ASDHIASDH")
     if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
         print("finished")
         return True
-    elif abs(x)==1 and y == -1 and takenpiecechecker(startx + x, starty - 1, wpa):
-        "asghdasd"
+    elif abs(x)==1 and y == -1 and takenpiecechecker(takenpiece,startx + x, starty - 1, wpa):
+        print("asghdasd")
         print("finished")
         return True
     elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
@@ -385,6 +389,7 @@ def snapper(x, y):
 # menu.add.button("START", start_game)
 # menu.mainloop(surface)
 run = True
+takenpiece = None
 while run:
     clock.tick(120)
     screen.fill(white)
@@ -472,7 +477,8 @@ while run:
                 elif item.name[1] == "r":
                     movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[0:2] == "wp":
-                    movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item) and not check_checker(wp,bp,wking,bking)
+                    print("got to wp")
+                    movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item, takenpiece) and not check_checker(wp,bp,wking,bking)
                     if movevalid:
                         item.move_num += 1
                         tempitem = None
@@ -510,6 +516,7 @@ while run:
                 #for i in wp:
                     #print(i.name,i.xpos,i.ypos)
                 if movevalid and turn:
+                    print("NICE")
                     move = not move
                     print("hello am here")
                     print(xsquare,ysquare)
