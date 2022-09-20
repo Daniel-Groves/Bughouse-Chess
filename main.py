@@ -54,6 +54,7 @@ board = [[" " for i in range(8)] for i in range(8)]
 # menu.add.text_input(board)
 
 def check_checker(wp, bp, wking, bking):
+    print("check checking")
     print(f"move {move}")
     print(f"turn {turn}")
     if move:
@@ -79,8 +80,12 @@ def check_checker(wp, bp, wking, bking):
                 print("this is good")
                 return checktake
         elif piece.name[1] == "b":
+            print("checking bishop")
+            if piece.name == "wb2":
+                print(f"bishop move yeah{bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)}")
             checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)
             if checktake:
+                print("checktake")
                 return checktake
         elif piece.name[1] == "n":
             checktake = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
@@ -95,7 +100,7 @@ def check_checker(wp, bp, wking, bking):
             if checktake:
                 return checktake
         elif piece.name[0:2] == "bp":
-            checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece)
+            checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece, takenpiece)
             if checktake:
                 return checktake
         else:
@@ -281,27 +286,19 @@ def rook_moves(x, y, startx, starty, rook):
     return returner
 
 def white_pawn_moves(x, y, startx, starty, first, wpa, takenpiece):
-    print("ASDHIASDH")
-    print(x,y)
-    print("ASDHIASDH")
     if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
-        print("finished")
         return True
     elif abs(x)==1 and y == -1 and takenpiecechecker(takenpiece,startx + x, starty - 1, wpa):
-        print("asghdasd")
-        print("finished")
         return True
     elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
-        print("finished")
         return True
     else:
-        print("finished bad")
         return False
 
-def black_pawn_moves(x, y, startx, starty, first, bpa):
+def black_pawn_moves(x, y, startx, starty, first, bpa, takenpiece):
     if x == 0 and y == 1 and not piecethere(startx, starty + 1, bpa):
         return True
-    elif abs(x)==1 and y == 1 and takenpiecechecker(startx + x, starty + 1, bpa):
+    elif abs(x)==1 and y == 1 and takenpiecechecker(takenpiece, startx + x, starty + 1, bpa):
         return True
     elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1, bpa) and first == 0:
         return True
@@ -428,7 +425,6 @@ while run:
                 xsquare, ysquare = snapper(x, y) #xsquare and ysquare are the squares the piece is trying to be placed on
                 item.placerx = 125 + xsquare * 75
                 item.placery = ysquare * 75
-                print(f"what{newposx,newposy}")
                 #if xsquare == 0 or ysquare == 0:
                     #item.placerx = 125 + newposx * 75
                     #item.xpos = newposx
@@ -436,7 +432,6 @@ while run:
                     #item.ypos = newposy
                 displacex = abs(newposx - xsquare)  #displacex and displacey represent absolute vector
                 displacey = abs(newposy - ysquare)
-                print(f"YYYY {xsquare,ysquare}")
                 print(item.name)
                 movevalid = True
                 tempx = item.xpos
@@ -444,16 +439,16 @@ while run:
                 item.xpos = xsquare
                 item.ypos = ysquare
                 for i in ap:
+                    print("testing")
                     if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
-                        print(f"am also here {i.name}")
                         ap.remove(i)
+                        print("removed")
                         takenpiece= i
-                        print(takenpiece)
+                        print(takenpiece.name)
                         if i.name[0] == "w":
                             wp.remove(i)
                         else:
                             bp.remove(i)
-                            print("removed")
                         tempitem = i
                 print("hello", item.name[0])
                 if item.name[0] == "w" and move == True:
@@ -486,7 +481,7 @@ while run:
                 elif item.name[0:2] == "bp":
                     print(f"check {check_checker(wp,bp,wking,bking)}")
                     x = item
-                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item) and not check_checker(wp,bp,wking,bking)
+                    movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item, takenpiece) and not check_checker(wp,bp,wking,bking)
                     item = x
                     print(f"check {check_checker(wp,bp,wking,bking)}")
                     print(movevalid)
@@ -496,6 +491,8 @@ while run:
                         tempitem = None
                 else:
                     movevalid = True
+                if movevalid:
+                    tempitem = None
                 print(f"{movevalid} move valid")
                 if not movevalid or not turn:
                     print("HOLA")
