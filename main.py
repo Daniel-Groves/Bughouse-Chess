@@ -1,4 +1,5 @@
 import pygame
+import time
 #
 # import pygame_menu
     # TODO: -Checking checking, -checkmate, en passant, castling, promotion, sounds
@@ -53,7 +54,27 @@ board = [[" " for i in range(8)] for i in range(8)]
 # def start_game():
 # menu.add.text_input(board)
 
+def checkmate_checker(wp, bp, wking, bking, checking_pieces):
+    print("checkmate checker")
+    if move:
+        pieces = bp
+        king = wking
+        print("TRUE")
+    else:
+        pieces = wp
+        king = bking
+    for piece in checking_pieces:
+        if piece.name[1] = "b":
+            #check bishop ray
+        elif piece.name[1] = "r":
+            #check rook ray
+        elif piece.name[1] = "q":
+            #check queen rays
+
+
 def check_checker(wp, bp, wking, bking):
+    global checking_pieces
+    checking_pieces = []
     print("check checking")
     print(f"move {move}")
     print(f"turn {turn}")
@@ -77,31 +98,38 @@ def check_checker(wp, bp, wking, bking):
             checktake = queenmoves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             print(f"valid? {checktake}")
             if checktake:
+                checking_pieces.append([piece,piece.name,piece.xpos,piece.ypos])
                 print("this is good")
                 return checktake
         elif piece.name[1] == "b":
             print("checking bishop")
             if piece.name == "wb2":
-                print(f"bishop move yeah{bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)}")
-            checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece)
+                print(king.xpos - piece.xpos, king.ypos - piece.ypos, king.xpos, king.ypos, piece.name)
+                print(f"bishop move yeah{bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)}")
+            checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
+                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
                 print("checktake")
                 return checktake
         elif piece.name[1] == "n":
             checktake = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
+                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
                 return checktake
         elif piece.name[1] == "r":
             checktake = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
+                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
                 return checktake
         elif piece.name[0:2] == "wp":
             checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece,takenpiece)
             if checktake:
+                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
                 return checktake
         elif piece.name[0:2] == "bp":
             checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece, takenpiece)
             if checktake:
+                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
                 return checktake
         else:
             return False
@@ -388,8 +416,15 @@ def snapper(x, y):
 run = True
 takenpiece = None
 while run:
+    turn = True
     clock.tick(120)
     screen.fill(white)
+    if check_checker(wp, bp, wking, bking):
+        print("early")
+        print(checking_pieces)
+        if checkmate_checker(wp, bp,wking,bking,checking_pieces):
+            print("CHECKMATE")
+        time.sleep(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
