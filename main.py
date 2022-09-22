@@ -54,6 +54,41 @@ board = [[" " for i in range(8)] for i in range(8)]
 # def start_game():
 # menu.add.text_input(board)
 
+def move_valid(item,xsquare,ysquare,wp,bp,wking,bkinh,newposx,newposy):
+    if item.name[1] == "k":
+        movevalid = king_moves(xsquare - item.xpos, ysquare - item.ypos, item) and not check_checker(wp, bp, wking,bking)
+    elif item.name[1] == "q":
+        print("AAAA")
+        movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
+        print(movevalid)
+    elif item.name[1] == "b":
+        movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
+    elif item.name[1] == "n":
+        movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
+    elif item.name[1] == "r":
+        movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
+    elif item.name[0:2] == "wp":
+        print("got to wp")
+        movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,takenpiece) and not check_checker(wp, bp, wking, bking)
+        if movevalid:
+            item.move_num += 1
+            tempitem = None
+            print("movevalid")
+    elif item.name[0:2] == "bp":
+        print(f"check {check_checker(wp, bp, wking, bking)}")
+        x = item
+        movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,takenpiece) and not check_checker(wp, bp, wking, bking)
+        item = x
+        print(f"check {check_checker(wp, bp, wking, bking)}")
+        print(movevalid)
+        print(item.name)
+        if movevalid:
+            item.move_num += 1
+            tempitem = None
+    else:
+        movevalid = True
+
+"""
 def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     print("checkmate checker")
     if move:
@@ -65,12 +100,14 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         king = bking
     for piece in checking_pieces:
         if piece.name[1] = "b":
-            #check bishop ray
+            for i in range(piece.xpos,wking.xpos):
+                for piece in pieces:
+                    if move
         elif piece.name[1] = "r":
             #check rook ray
         elif piece.name[1] = "q":
             #check queen rays
-
+"""
 
 def check_checker(wp, bp, wking, bking):
     global checking_pieces
@@ -169,7 +206,7 @@ def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
         takenpiece = None
         return False
 
-def kingmoves(x, y, item):
+def king_moves(x, y, item):
     #print(f"asdasd {item.xpos, item.ypos}")
     #print(x,y)
     if abs(x) < 2 and abs(y) < 2 and not piecethere(item.xpos+x,item.ypos+y,item):
@@ -180,7 +217,7 @@ def kingmoves(x, y, item):
         #print("am i here")
     return returner
 
-def queenmoves(x, y, startx, starty, queen):
+def queen_moves(x, y, startx, starty, queen):
     print(f"ASHDASKDKJASDKJASDK {queen.name}")
     returner = True
     print(f"vactors {x,y}")
@@ -334,7 +371,7 @@ def black_pawn_moves(x, y, startx, starty, first, bpa, takenpiece):
         return False
 
 class Piece:
-    def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num = 0):
+    def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num = 0, moveset):
         self.xpos = xpos
         self.ypos = ypos
         self.colour = colour
@@ -343,6 +380,7 @@ class Piece:
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
         self.move_num = move_num
+        self.moveset = moveset
 
     def info(self):
         print(self.xpos, self.ypos)
@@ -353,6 +391,8 @@ class Piece:
 
     def place(self):
         board[self.ypos - 1][self.xpos - 1] = self.name
+
+
 
 
 wp = []
@@ -495,10 +535,10 @@ while run:
                 print(move)
                 print(turn)
                 if item.name[1] == "k":
-                    movevalid = kingmoves(xsquare-item.xpos, ysquare-item.ypos,item) and not check_checker(wp,bp,wking,bking)
+                    movevalid = king_moves(xsquare-item.xpos, ysquare-item.ypos,item) and not check_checker(wp,bp,wking,bking)
                 elif item.name[1] == "q":
                     print("AAAA")
-                    movevalid = queenmoves(-(newposx - xsquare),ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
+                    movevalid = queen_moves(-(newposx - xsquare),ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
                     print(movevalid)
                 elif item.name[1] == "b":
                     movevalid = bishop_moves(-(newposx - xsquare),ysquare - newposy, newposx, newposy, item) and not check_checker(wp,bp,wking,bking)
@@ -526,6 +566,9 @@ while run:
                         tempitem = None
                 else:
                     movevalid = True
+
+                movevalid = move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy)
+
                 if movevalid:
                     tempitem = None
                 print(f"{movevalid} move valid")
