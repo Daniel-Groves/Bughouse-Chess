@@ -93,6 +93,8 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
 def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     checkmate = True
     print("checkmate checker")
+    for i in checking_pieces:
+        print(i.name)
     if move:
         pieces = bp
         king = wking
@@ -100,16 +102,30 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     else:
         pieces = wp
         king = bking
+        print(type(checking_pieces))
     for checker in checking_pieces:
-        if checker.name[1] = "b":
+        print("got here")
+        if checker.name == "b":
             for i in range(0,wking.xpos-checker.xpos):
                 for piece in pieces:
                     if move_valid(piece, checker.xpos+i, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp, bp, wking, bking):
                         checkmate = False
-        elif piece.name[1] = "r":
-            #check rook ray
-        elif piece.name[1] = "q":
-            #check queen rays
+        elif checker.name[1] == "r":
+            if checker.xpos - king.xpos == 0:
+                for i in range(0,wking.ypos-checker.ypos):
+                    for piece in pieces:
+                        if move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            checkmate = False
+            if checker.ypos - king.ypos == 0:
+                for i in range(0,wking.xpos-checker.xpos):
+                    for piece in pieces:
+                        if move_valid(piece,checker.xpos+i, checker.ypos,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            checkmate = False
+            pass
+        elif checker.name[1] == "q":
+            pass
+        checking_pieces = None
+    return checkmate
 
 
 
@@ -139,7 +155,7 @@ def check_checker(wp, bp, wking, bking):
             checktake = queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             print(f"valid? {checktake}")
             if checktake:
-                checking_pieces.append([piece,piece.name,piece.xpos,piece.ypos])
+                checking_pieces.append(piece)
                 print("this is good")
                 return checktake
         elif piece.name[1] == "b":
@@ -149,28 +165,28 @@ def check_checker(wp, bp, wking, bking):
                 print(f"bishop move yeah{bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)}")
             checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
+                checking_pieces.append(piece)
                 print("checktake")
                 return checktake
         elif piece.name[1] == "n":
             checktake = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
-                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
+                checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "r":
             checktake = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
-                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
+                checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "wp":
             checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece,takenpiece)
             if checktake:
-                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
+                checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "bp":
             checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece.move_num, piece, takenpiece)
             if checktake:
-                checking_pieces.append([piece, piece.name, piece.xpos, piece.ypos])
+                checking_pieces.append(piece)
                 return checktake
         else:
             return False
@@ -462,13 +478,12 @@ while run:
     turn = True
     clock.tick(120)
     screen.fill(white)
-    """
     if check_checker(wp, bp, wking, bking):
         print("early")
         print(checking_pieces)
         if checkmate_checker(wp, bp,wking,bking,checking_pieces):
             print("CHECKMATE")
-        time.sleep(10)"""
+            time.sleep(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
