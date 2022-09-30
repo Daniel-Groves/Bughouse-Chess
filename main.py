@@ -63,7 +63,7 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
         print(movevalid)
     elif item.name[1] == "b":
         print("am at bishop move")
-        print(newposy)
+        print(newposy,newposx)
         print(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
         movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
     elif item.name[1] == "n":
@@ -101,10 +101,12 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     if move:
         pieces = wp
         king = wking
+        constant = 1
         print("TRUE")
     else:
         pieces = bp
         king = bking
+        constant = -1
         print(type(checking_pieces))
     for checker in checking_pieces:
         print("got here")
@@ -131,13 +133,16 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                 print(king.name)
                 print(king.ypos)
                 print(checker.ypos)
-                for i in range(0,abs(king.ypos-checker.ypos)):
+                for i in range(0,abs(king.ypos-checker.ypos)+1):
+                    print(f"i  {i}")
                     for piece in pieces:
-                        if piece.name == "bb2" and i == 5:
+                        print(f"NAME {piece.name}")
+                        if piece.name == "bb2" and i ==5:
                             print("asHDOUWN")
-                            print(piece.name,checker.xpos, checker.ypos+i,piece.xpos,piece.ypos)
-                            print(move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos))
-                        if move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            print(checker.xpos,checker.ypos)
+                            print(piece.name,checker.xpos, checker.ypos+(constant*i),piece.xpos,piece.ypos)
+                            print(move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos))
+                        if move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
                             checkmate = False
             if checker.ypos - king.ypos == 0:
                 for i in range(0,wking.xpos-checker.xpos):
@@ -322,18 +327,21 @@ def queen_moves(x, y, startx, starty, queen):
     return returner
 
 def bishop_moves(x, y, startx, starty, bishop):
+    print(f"things {x, y, startx, starty}")
     if abs(x) == abs(y):
         for i in range(0, abs(x) + 1):
             # print(i)
             # print("i am here")
             if x < 0:
                 vectorx = startx - i
+                print(vectorx)
             elif x > 0:
                 vectorx = startx + i
             if y < 0:
                 vectory = starty - i
             elif y > 0:
                 vectory = starty + i
+                print(vectory)
 
             if abs(x) == i and piecethereexclude(vectorx, vectory, bishop):
                 return True
@@ -503,7 +511,7 @@ while run:
         print(checking_pieces)
         if checkmate_checker(wp, bp,wking,bking,checking_pieces):
             print("CHECKMATE")
-            time.sleep(10)
+            time.sleep(1000)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
