@@ -62,6 +62,9 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
         movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
         print(movevalid)
     elif item.name[1] == "b":
+        print("am at bishop move")
+        print(newposy)
+        print(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
         movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
     elif item.name[1] == "n":
         movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
@@ -96,24 +99,44 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     for i in checking_pieces:
         print(i.name)
     if move:
-        pieces = bp
+        pieces = wp
         king = wking
         print("TRUE")
     else:
-        pieces = wp
+        pieces = bp
         king = bking
         print(type(checking_pieces))
     for checker in checking_pieces:
         print("got here")
         if checker.name == "b":
-            for i in range(0,wking.xpos-checker.xpos):
+            for i in range(0,king.xpos-checker.xpos):
                 for piece in pieces:
                     if move_valid(piece, checker.xpos+i, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp, bp, wking, bking):
                         checkmate = False
         elif checker.name[1] == "r":
             if checker.xpos - king.xpos == 0:
-                for i in range(0,wking.ypos-checker.ypos):
+                for i in range(0,king.ypos-checker.ypos):
                     for piece in pieces:
+                        if move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            checkmate = False
+            if checker.ypos - king.ypos == 0:
+                for i in range(0,king.xpos-checker.xpos):
+                    for piece in pieces:
+                        if move_valid(piece,checker.xpos+i, checker.ypos,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            checkmate = False
+            pass
+        elif checker.name[1] == "q":
+            if checker.xpos - king.xpos == 0:
+                print(f"hola{abs(king.ypos-checker.ypos)}")
+                print(king.name)
+                print(king.ypos)
+                print(checker.ypos)
+                for i in range(0,abs(king.ypos-checker.ypos)):
+                    for piece in pieces:
+                        if piece.name == "bb2" and i == 5:
+                            print("asHDOUWN")
+                            print(piece.name,checker.xpos, checker.ypos+i,piece.xpos,piece.ypos)
+                            print(move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos))
                         if move_valid(piece,checker.xpos, checker.ypos+i,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
                             checkmate = False
             if checker.ypos - king.ypos == 0:
@@ -121,8 +144,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                     for piece in pieces:
                         if move_valid(piece,checker.xpos+i, checker.ypos,wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
                             checkmate = False
-            pass
-        elif checker.name[1] == "q":
             pass
         checking_pieces = None
     return checkmate
@@ -256,7 +277,6 @@ def queen_moves(x, y, startx, starty, queen):
                     vectory = starty - i
                 elif y > 0:
                     vectory = starty + i
-                print(f"FFFF {vectorx, vectory}")
                 if abs(x) == i:
                     print("passed first")
                 if abs(x) == i and piecethereexclude(vectorx,vectory,queen):
