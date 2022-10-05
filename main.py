@@ -138,14 +138,23 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                 for i in range(0,abs(king.ypos-checker.ypos)+1):
                     print(f"i  {i}")
                     for piece in pieces:
+                        tempx = piece.xpos
+                        tempy = piece.ypos
+                        piece.xpos = checker.xpos
+                        piece.ypos = checker.ypos+(constant*i)
                         print(f"NAME {piece.name}")
-                        if piece.name == "bb2" and i ==5:
+                        if piece.name == "bb2" and i ==0:
                             print("asHDOUWN")
                             print(checker.xpos,checker.ypos)
-                            print(piece.name,checker.xpos, checker.ypos+(constant*i),piece.xpos,piece.ypos)
-                            print(f"HERE {move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos)}")
-                        if move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos):
+                            print(piece.name,checker.xpos, checker.ypos+(constant*i),tempx,tempy)
+                            print(f"HERE {move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,tempx,tempy)}")
+                        if move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,tempx,tempy):
                             checkmate = False
+                            piece.xpos = tempx
+                            piece.ypos = tempy
+                        else:
+                            piece.xpos = tempx
+                            piece.ypos = tempy
             if checker.ypos - king.ypos == 0:
                 for i in range(0,wking.xpos-checker.xpos):
                     for piece in pieces:
@@ -329,6 +338,7 @@ def queen_moves(x, y, startx, starty, queen):
     return returner
 
 def bishop_moves(x, y, startx, starty, bishop):
+    global returner
     print(f"things {x, y, startx, starty}")
     if abs(x) == abs(y):
         for i in range(1, abs(x) + 1):
@@ -589,6 +599,8 @@ while run:
                 print(move)
                 print(turn)
 
+
+                print(f"INFO {xsquare, ysquare, newposx, newposy}")
                 movevalid = move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy)
 
                 if movevalid:
