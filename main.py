@@ -63,8 +63,10 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
         print(movevalid)
     elif item.name[1] == "b":
         print("am at bishop move")
-        print(newposy,newposx)
+        print(xsquare,ysquare,newposx,newposy)
         print(-(newposx - xsquare), ysquare - newposy, newposx, newposy)
+        print(f"ASDAKJASDKJ {bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)}")
+        print(f"CHECK {check_checker(wp, bp, wking, bking)}")
         movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
     elif item.name[1] == "n":
         movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
@@ -141,8 +143,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             print("asHDOUWN")
                             print(checker.xpos,checker.ypos)
                             print(piece.name,checker.xpos, checker.ypos+(constant*i),piece.xpos,piece.ypos)
-                            print(move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos))
-                        if move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos) and not check_checker(wp,bp,wking,bking):
+                            print(f"HERE {move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos)}")
+                        if move_valid(piece,checker.xpos, checker.ypos+(constant*i),wp,bp,wking,bking,piece.xpos,piece.ypos):
                             checkmate = False
             if checker.ypos - king.ypos == 0:
                 for i in range(0,wking.xpos-checker.xpos):
@@ -329,7 +331,7 @@ def queen_moves(x, y, startx, starty, queen):
 def bishop_moves(x, y, startx, starty, bishop):
     print(f"things {x, y, startx, starty}")
     if abs(x) == abs(y):
-        for i in range(0, abs(x) + 1):
+        for i in range(1, abs(x) + 1):
             # print(i)
             # print("i am here")
             if x < 0:
@@ -343,7 +345,11 @@ def bishop_moves(x, y, startx, starty, bishop):
                 vectory = starty + i
                 print(vectory)
 
+            print(vectorx,vectory)
+            print(piecethereexclude(vectorx, vectory, bishop))
+
             if abs(x) == i and piecethereexclude(vectorx, vectory, bishop):
+                print("hello")
                 return True
             elif piecethere(vectorx, vectory, bishop):
                 returner = False
@@ -352,6 +358,7 @@ def bishop_moves(x, y, startx, starty, bishop):
                 returner = True
     else:
         returner = False
+    print(f"return {returner}")
     return returner
 
 def knight_moves(x, y, startx, starty, knight):
