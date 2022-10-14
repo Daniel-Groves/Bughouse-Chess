@@ -48,11 +48,6 @@ brook_image = pygame.transform.scale(brook_image, image_constant)
 bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
 
 board = [[" " for i in range(8)] for i in range(8)]
-#print("".join([f"\n{i}" for i in board]))
-
-
-# def start_game():
-# menu.add.text_input(board)
 
 def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
     if item.name[1] == "k":
@@ -120,7 +115,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         print(tempx,tempy)
         print(king.xpos,king.ypos)
         print(f"king valid {move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy)}")
-        if move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy) and not check_checker(wp,bp,wking,bking) and king.xpos > 0 and king.ypos > 0:
+        blockage = False
+        for piece in pieces:
+            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece.name[0] != king.name[0]:
+                blockage = True
+        if move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy) and not check_checker(wp,bp,wking,bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
         king.xpos = tempx
         king.ypos = tempy
