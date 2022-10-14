@@ -128,7 +128,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
 
     for checker in checking_pieces:
         print("got here")
-        if checker.name == "b":
+        if checker.name[1] == "b":
             for i in range(0,king.xpos-checker.xpos):
                 for piece in pieces:
                     tempx = piece.xpos
