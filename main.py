@@ -119,12 +119,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         print(king.name)
         print(tempx,tempy)
         print(king.xpos,king.ypos)
-        if vector == (1,0):
-            print(f"king valid {(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy)}")
-        if move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy) and not check_checker(wp,bp,wking,bking):
+        print(f"king valid {move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy)}")
+        if move_valid(king,king.xpos,king.ypos,wp,bp,wking,bking,tempx,tempy) and not check_checker(wp,bp,wking,bking) and king.xpos > 0 and king.ypos > 0:
             checkmate = False
-            king.xpos = tempx
-            king.ypos = tempy
+        king.xpos = tempx
+        king.ypos = tempy
     for i in checking_pieces:
         print(i.name)
 
