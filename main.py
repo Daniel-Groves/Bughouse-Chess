@@ -128,13 +128,16 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
 
     for checker in checking_pieces:
         print("got here")
+        print(checker.name)
         if checker.name[1] == "b":
-            for i in range(0,king.xpos-checker.xpos):
+            for i in range(0,abs(king.xpos-checker.xpos)):
                 for piece in pieces:
                     tempx = piece.xpos
                     tempy = piece.ypos
                     piece.xpos = checker.xpos + (constant * i)
                     piece.ypos = checker.ypos + (constant * i)
+                    if piece.name[1] == "q":
+                        print(f"more print {piece.name, tempx, tempy, piece.xpos, piece.ypos}")
                     if i == 0:
                         ap.remove(checker)
                         print("removed")
@@ -159,10 +162,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         tempitem = None
         elif checker.name[1] == "r":
             if checker.xpos - king.xpos == 0:
-                for i in range(0,king.ypos-checker.ypos):
+                for i in range(0,abs(king.ypos-checker.ypos)):
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
+                        if king.ypos-checker.ypos
                         piece.xpos = checker.xpos + (constant * i)
                         piece.ypos = checker.ypos + (constant * i)
                         if i == 0:
@@ -188,7 +192,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                                 bp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
-                for i in range(0,king.xpos-checker.xpos):
+                for i in range(0,abs(king.xpos-checker.xpos)):
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
@@ -219,7 +223,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             pass
         elif checker.name[1] == "q":
             if checker.xpos - king.xpos == 0:
-
                 for i in range(0,abs(king.ypos-checker.ypos)+1):
                     print(f"i  {i}")
                     for piece in pieces:
@@ -286,6 +289,35 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             piece.ypos = tempy
                         if tempitem:
                             print("WHYYWYEHA")
+                            ap.append(tempitem)
+                            if tempitem.name[0] == "w":
+                                wp.append(tempitem)
+                            else:
+                                bp.append(tempitem)
+                            tempitem = None
+            else:
+                for i in range(0, abs(king.xpos - checker.xpos)+1):
+                    for piece in pieces:
+                        tempx = piece.xpos
+                        tempy = piece.ypos
+                        piece.xpos = checker.xpos + (constant * i)
+                        piece.ypos = checker.ypos + (constant * i)
+                        if i == 0:
+                            ap.remove(checker)
+                            print("removed")
+                            takenpiece = checker
+                            print(takenpiece.name)
+                            if checker.name[0] == "w":
+                                wp.remove(checker)
+                            else:
+                                bp.remove(checker)
+                            tempitem = checker
+                        if move_valid(piece, checker.xpos + i, checker.ypos + i, wp, bp, wking, bking, tempx,
+                                      tempy):
+                            checkmate = False
+                            piece.xpos = tempx
+                            piece.ypos = tempy
+                        if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
                                 wp.append(tempitem)
@@ -386,7 +418,8 @@ def piecethereexclude(xsquare, ysquare, compare):
 
 def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
     print(xsquare, ysquare, compare.name)
-    print(takenpiece.name, takenpiece.xpos, takenpiece.ypos)
+    if not takenpiece:
+        return False
     if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name != compare.name:
         print("TRUEUEE")
         return True
@@ -507,7 +540,6 @@ def knight_moves(x, y, startx, starty, knight):
     print(x,y)
     print(startx, starty)
     if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
-        print("got here")
         if piecethereexclude(startx + x, starty + y, knight) or not piecethere(startx + x, starty + y, knight):
             return True
     else:
@@ -735,7 +767,7 @@ while run:
                 print(f"INFO {xsquare, ysquare, newposx, newposy}")
                 movevalid = move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy)
 
-                if movevalid:
+                if movevalid and turn:
                     tempitem = None
                 print(f"{movevalid} move valid")
                 if not movevalid or not turn:
