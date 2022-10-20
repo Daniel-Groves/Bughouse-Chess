@@ -1,5 +1,6 @@
 import pygame
 import time
+import numpy
 #
 # import pygame_menu
     # TODO: -Checking checking, -checkmate, en passant, castling, promotion, sounds
@@ -75,11 +76,9 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
             tempitem = None
             print("movevalid")
     elif item.name[0:2] == "bp":
-        print(f"check {check_checker(wp, bp, wking, bking)}")
         x = item
         movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,takenpiece) and not check_checker(wp, bp, wking, bking)
         item = x
-        print(f"check {check_checker(wp, bp, wking, bking)}")
         print(movevalid)
         print(item.name)
         if movevalid:
@@ -134,8 +133,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                 for piece in pieces:
                     tempx = piece.xpos
                     tempy = piece.ypos
-                    piece.xpos = checker.xpos + (constant * i)
-                    piece.ypos = checker.ypos + (constant * i)
+                    piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
+                    piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                     if piece.name[1] == "q":
                         print(f"more print {piece.name, tempx, tempy, piece.xpos, piece.ypos}")
                     if i == 0:
@@ -166,9 +165,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
-                        if king.ypos-checker.ypos
-                        piece.xpos = checker.xpos + (constant * i)
-                        piece.ypos = checker.ypos + (constant * i)
+                        piece.ypos = checker.ypos + (numpy.sign(king.ypos-checker.ypos) * i)
                         if i == 0:
                             ap.remove(checker)
                             print("removed")
@@ -300,8 +297,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
-                        piece.xpos = checker.xpos + (constant * i)
-                        piece.ypos = checker.ypos + (constant * i)
+                        piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
+                        piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                         if i == 0:
                             ap.remove(checker)
                             print("removed")
@@ -312,7 +309,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             else:
                                 bp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, checker.xpos + i, checker.ypos + i, wp, bp, wking, bking, tempx,
+                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -336,21 +333,26 @@ def check_checker(wp, bp, wking, bking):
     print("check checking")
     print(f"move {move}")
     print(f"turn {turn}")
+    print(f"okayyy {bking.xpos, bking.ypos}")
     if move:
         pieces = bp
         king = wking
         print("TRUE")
     else:
+        print("aight")
         pieces = wp
         king = bking
     global piece
+
     for piece in pieces:
         if piece.name[1] == "k":
             checktake = False
         elif piece.name[1] == "q":
             print("checking AAAA")
             print(piece.name)
+            print(king.name, king.xpos, king.ypos)
             print(king.xpos, king.ypos)
+            print(piece.xpos, piece.ypos)
             print((piece.xpos - king.xpos), piece.ypos - king.ypos)
             print(f"AAAAAAAAA {piece.name}")
             checktake = queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
