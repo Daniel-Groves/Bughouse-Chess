@@ -16,6 +16,7 @@ screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 white = (255, 255, 255)
 image_constant = (75, 75)
+king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)]
 move = True   #move being true means white to move
 board_image = pygame.image.load(
     r"Images\board.png")
@@ -51,8 +52,10 @@ bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
 board = [[" " for i in range(8)] for i in range(8)]
 
 def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
+    print(f"ITEM NAME {item.name}")
     if item.name[1] == "k":
-        movevalid = king_moves(xsquare - item.xpos, ysquare - item.ypos, item) and not check_checker(wp, bp, wking,bking)
+        print("HEREEEE")
+        movevalid = king_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking,bking)
     elif item.name[1] == "q":
         print("AAAA")
         movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(wp, bp, wking, bking)
@@ -87,10 +90,10 @@ def move_valid(item,xsquare,ysquare,wp,bp,wking,bking,newposx,newposy):
     else:
         movevalid = True
     return movevalid
+    print(f"I AM RETURNING {movevalid}")
 
 
 def checkmate_checker(wp, bp, wking, bking, checking_pieces):
-    king_vectors = [(0,1),(1,1),(1,0),(-1,1),(0,-1),(-1,-1),(-1,0),(1,-1)]
     checkmate = True
     print("checkmate checker")
     if move:
@@ -457,15 +460,28 @@ def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
         takenpiece = None
         return False
 
-def king_moves(x, y, item):
-    #print(f"asdasd {item.xpos, item.ypos}")
-    #print(x,y)
-    if abs(x) < 2 and abs(y) < 2 and not piecethere(item.xpos+x,item.ypos+y,item):
-        #print("why am i here")
+def king_moves(x, y, startx, starty, item):
+    print(f"bonjour {x,y}")
+    if abs(x) < 2 and abs(y) < 2 and not piecethere(startx+x,starty+y,item):
+        print("bonjour 2")
         returner = True
+        for vector in king_vectors:
+            print(f"vector {vector}")
+            print(startx, starty,x,y)
+            print(wking.xpos,wking.ypos, startx + x + vector[0], starty + y + vector[1])
+            print(item.name)
+            if item.name[0] == "w":
+                if bking.xpos == startx + x + vector[0] and bking.ypos == starty + y + vector[1]:
+                    returner = False
+                    break
+            else:
+                print("pretty far")
+                if wking.xpos == startx + x + vector[0] and wking.ypos == starty + y + vector[1]:
+                    returner = False
+                    break
     else:
         returner = False
-        #print("am i here")
+    print(f"bonjour 3 {returner}")
     return returner
 
 def queen_moves(x, y, startx, starty, queen):
@@ -726,8 +742,6 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     for count, value in enumerate(board):
-        #thing = myfont.render((" ".join(value)), True, (0, 0, 0))
-        #screen.blit(thing, (250, 100 + (30 * count)))
         screen.blit(board_image, (200, 75))
     for i in ap:
         screen.blit(i.image, (i.placerx, i.placery))
@@ -764,7 +778,6 @@ while run:
                     #item.ypos = newposy
                 displacex = abs(newposx - xsquare)  #displacex and displacey represent absolute vector
                 displacey = abs(newposy - ysquare)
-                print(item.name)
                 movevalid = True
                 tempx = item.xpos
                 tempy = item.ypos
@@ -783,24 +796,23 @@ while run:
                             bp.remove(i)
                         tempitem = i
                 print("hello", item.name[0])
+                print(f" scre {item.name, turn, move}")
                 if item.name[0] == "w" and move == True:
                     turn = True
                 elif item.name[0] == "b" and move == False:
+                    print("CHANGED")
                     turn = True
                 else:
                     turn = False
-                print(move)
-                print(turn)
+                print(f"scre 2 {item.name, turn, move}")
 
 
-                print(f"INFO {xsquare, ysquare, newposx, newposy}")
                 movevalid = move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy)
+                print(f"INFO {xsquare, ysquare, newposx, newposy, movevalid}")
 
                 if movevalid and turn:
                     tempitem = None
-                print(f"{movevalid} move valid")
                 if not movevalid or not turn:
-                    print("HOLA")
                     print(tempx,tempy)
                     print(item.name)
                     item.placerx = 125 + tempx * 75
@@ -808,7 +820,6 @@ while run:
                     item.placery = tempy * 75
                     item.ypos = tempy
                     if tempitem:
-                        print("WHYYWYEHA")
                         ap.append(tempitem)
                         if tempitem.name[0] == "w":
                             wp.append(tempitem)
@@ -830,13 +841,7 @@ while run:
                                 wp.remove(i)
                             else:
                                 bp.remove(i)
-                    #item.xpos = tempx
-                    #item.ypos = tempy
                     print(f"updated {item.xpos, item.ypos}")
-                #for i in wp:
-                    #print(i.name,i.xpos,i.ypos)
-                #for i in bp:
-                    #print(i.name,i.xpos,i.ypos)
 
 
             except AttributeError:
