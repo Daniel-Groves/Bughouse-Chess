@@ -408,51 +408,50 @@ def king_moves(x, y, startx, starty, item):
 
 def queen_moves(x, y, startx, starty, queen):
     returner = True
-    if abs(x) == abs(y) or x == 0 or y == 0:
-        if abs(x) == abs(y):
-            for i in range(0, abs(x) + 1):
-                if x < 0:
-                    vectorx = startx - i
-                elif x > 0:
-                    vectorx = startx + i
-                if y < 0:
-                    vectory = starty - i
-                elif y > 0:
-                    vectory = starty + i
-                if abs(x) == i and piecethereexclude(vectorx, vectory, queen):
-                    return True
-                elif piecethere(vectorx, vectory, queen):
-                    returner = False
-                    return returner
-                else:
-                    returner = True
-        elif y == 0:
-            for i in range(1, abs(x) + 1):
-                if x > 0:
-                    vectorx = startx + i
-                if x < 0:
-                    vectorx = startx - i
-                if abs(x) == i and piecethereexclude(vectorx, starty, queen):
-                    return True
-                elif piecethere(vectorx, starty, queen):
-                    returner = False
-                    break
-                else:
-                    returner = True
-        elif x == 0:
+    if abs(x) == abs(y):
+        for i in range(0, abs(x) + 1):
+            if x < 0:
+                vectorx = startx - i
+            elif x > 0:
+                vectorx = startx + i
+            if y < 0:
+                vectory = starty - i
+            elif y > 0:
+                vectory = starty + i
+            if abs(x) == i and piecethereexclude(vectorx, vectory, queen):
+                return True
+            elif piecethere(vectorx, vectory, queen):
+                returner = False
+                return returner
+            else:
+                returner = True
+    elif y == 0:
+        for i in range(1, abs(x) + 1):
+            if x > 0:
+                vectorx = startx + i
+            if x < 0:
+                vectorx = startx - i
+            if abs(x) == i and piecethereexclude(vectorx, starty, queen):
+                return True
+            elif piecethere(vectorx, starty, queen):
+                returner = False
+                break
+            else:
+                returner = True
+    elif x == 0:
 
-            for i in range(1, abs(y) + 1):
-                if y > 0:
-                    vectory = starty + i
-                if y < 1:
-                    vectory = starty - i
-                if abs(y) == i and piecethereexclude(startx, vectory, queen):
-                    return True
-                elif piecethere(startx, vectory, queen):
-                    returner = False
-                    break
-                else:
-                    returner = True
+        for i in range(1, abs(y) + 1):
+            if y > 0:
+                vectory = starty + i
+            if y < 1:
+                vectory = starty - i
+            if abs(y) == i and piecethereexclude(startx, vectory, queen):
+                return True
+            elif piecethere(startx, vectory, queen):
+                returner = False
+                break
+            else:
+                returner = True
     else:
         returner = False
     return returner
@@ -605,8 +604,9 @@ for i in ap:
     i.namer()
 print("".join([f"\n{i}" for i in board]))
 
-pygame.init()
-surface = pygame.display.set_mode((1000, 800))
+if __name__ == "__main__":
+    pygame.init()
+    surface = pygame.display.set_mode((1000, 800))
 
 
 def snapper(x, y):
@@ -627,7 +627,8 @@ def snapper(x, y):
 # menu.mainloop(surface)
 run = True
 takenpiece = None
-while run:
+
+while __name__ == "__main__":
     turn = True
     clock.tick(120)
     screen.fill(white)
@@ -638,8 +639,7 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    for count, value in enumerate(board):
-        screen.blit(board_image, (200, 75))
+    screen.blit(board_image, (200, 75))
     for i in ap:
         screen.blit(i.image, (i.placerx, i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
