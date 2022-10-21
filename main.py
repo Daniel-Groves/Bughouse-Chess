@@ -309,7 +309,36 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             else:
                                 bp.append(tempitem)
                             tempitem = None
-            pass
+        elif checker.name[1] == "n":
+            for piece in pieces:
+                if piece.name[1] == "k":
+                    continue
+                tempx = piece.xpos
+                tempy = piece.ypos
+                piece.xpos = checker.xpos
+                piece.ypos = checker.ypos
+                ap.remove(checker)
+                takenpiece = checker
+                if checker.name[0] == "w":
+                    wp.remove(checker)
+                else:
+                    bp.remove(checker)
+                tempitem = checker
+                if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                              tempy):
+                    checkmate = False
+                    piece.xpos = tempx
+                    piece.ypos = tempy
+                else:
+                    piece.xpos = tempx
+                    piece.ypos = tempy
+                if tempitem:
+                    ap.append(tempitem)
+                    if tempitem.name[0] == "w":
+                        wp.append(tempitem)
+                    else:
+                        bp.append(tempitem)
+                    tempitem = None
         checking_pieces = None
     return checkmate
 
