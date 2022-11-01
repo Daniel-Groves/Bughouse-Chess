@@ -12,13 +12,19 @@ import numpy
 # TODO: - sounds
 
 
-pygame.init()
+pygame.init() #initialises pygame, screen and clock
 screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
-white = (255, 255, 255)
-image_constant = (75, 75)
-king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)]
+
+
+# sets up some important constants
+white = (255, 255, 255) #constant for white colour
+image_constant = (75, 75) #constant for image scaling
+king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)] #possible king move vectors
 move = True  # move being true means white to move
+
+
+#loads all the images from the Images folder and then scales all 
 board_image = pygame.image.load(
     r"Images\board.png")
 wking_image = pygame.image.load(
@@ -50,51 +56,52 @@ bknight_image = pygame.transform.scale(bknight_image, image_constant)
 brook_image = pygame.transform.scale(brook_image, image_constant)
 bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
 
-board = [[" " for i in range(8)] for i in range(8)]
 
 
-def move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy):
+board = [[" " for i in range(8)] for i in range(8)] #creates a list of lists of blank text board
+
+def board_text(ap): #function to print out a text version of the board
+    for piece in ap:
+        piece.place()
+    print("".join([f"\n{i}" for i in board]))
+
+
+def move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy): #function to see which piece it is and run respective function (could clean this up and put functions in class)
     if item.name[1] == "k":
-        movevalid = king_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(
-            wp, bp, wking, bking)
+        movevalid = king_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "q":
-        movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(
-            wp, bp, wking, bking)
+        movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "b":
-        movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(
-            wp, bp, wking, bking)
+        movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "n":
-        movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(
-            wp, bp, wking, bking)
+        movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "r":
-        movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item) and not check_checker(
-            wp, bp, wking, bking)
+        movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[0:2] == "wp":
         movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
-                                     takenpiece) and not check_checker(wp, bp, wking, bking)
-        if movevalid:
+                                     takenpiece)
+        if movevalid  and not check_checker(wp, bp, wking, bking):
             item.move_num += 1
             tempitem = None
     elif item.name[0:2] == "bp":
-        x = item
         movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
-                                     takenpiece) and not check_checker(wp, bp, wking, bking)
-        item = x
-        if movevalid:
+                                     takenpiece)
+        if movevalid  and not check_checker(wp, bp, wking, bking):
             item.move_num += 1
             tempitem = None
     else:
         movevalid = True
-    return movevalid
+    return movevalid and not check_checker(wp, bp, wking, bking)
 
 
 def checkmate_checker(wp, bp, wking, bking, checking_pieces):
     checkmate = True
     if move:
         pieces = wp
+        notpieces = bp
         king = wking
         constant = 1
-    else:
+    elif not move:
         pieces = bp
         king = bking
         constant = -1
@@ -106,14 +113,14 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         king.ypos = king.ypos + vector[1]
         blockage = False
         for piece in pieces:
-            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece.name[0] != king.name[0]:
+            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos):
                 blockage = True
-        if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,
-                                                                                                            wking,
-                                                                                                            bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
+        if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,wking,bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
+            continue
         king.xpos = tempx
         king.ypos = tempy
+        
 
     for checker in checking_pieces:
         if checker.name[1] == "b":
@@ -640,7 +647,7 @@ wp.append(Piece(f"wn2", 7, 8, "w", wknight_image))
 wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
 wp.append(Piece(f"wr2", 8, 8, "w", wrook_image))
 
-print("".join([f"\n{i}" for i in board]))
+
 
 bp = []
 for i in range(1, 9):
@@ -655,13 +662,11 @@ bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
 bp.append(Piece(f"br1", 1, 1, "w", brook_image))
 bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
-for i in bp:
-    (i.info())
-    i.place()
 ap = wp + bp
 for i in ap:
-    i.namer()
-print("".join([f"\n{i}" for i in board]))
+    i.place()
+    
+
 
 if __name__ == "__main__":
     pygame.init()
@@ -686,6 +691,8 @@ def snapper(x, y):
 # menu.mainloop(surface)
 run = True
 takenpiece = None
+
+board_text(ap)
 
 while __name__ == "__main__":
     turn = True
