@@ -80,13 +80,13 @@ def move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy): 
     elif item.name[0:2] == "wp":
         movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid  and not check_checker(wp, bp, wking, bking):
+        if movevalid  and not check_checker(wp, bp, wking, bking) and turn:
             item.move_num += 1
             tempitem = None
     elif item.name[0:2] == "bp":
         movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid  and not check_checker(wp, bp, wking, bking):
+        if movevalid  and not check_checker(wp, bp, wking, bking) and turn:
             item.move_num += 1
             tempitem = None
     else:
@@ -94,27 +94,25 @@ def move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy): 
     return movevalid and not check_checker(wp, bp, wking, bking)
 
 
-def checkmate_checker(wp, bp, wking, bking, checking_pieces):
+def checkmate_checker(wp, bp, wking, bking, checking_pieces): #function to check if it is checkmate
     checkmate = True
-    if move:
+    global king
+    if move: #see whose move it is in order to determine for who we are detecting checkmate
         pieces = wp
-        notpieces = bp
         king = wking
         constant = 1
-    elif not move:
+    else:
         pieces = bp
         king = bking
         constant = -1
 
-    for vector in king_vectors:
-        tempx = king.xpos
-        tempy = king.ypos
-        king.xpos = king.xpos + vector[0]
-        king.ypos = king.ypos + vector[1]
+    for vector in king_vectors: #checks if there is anywhere the king can legally move to
+        tempx, tempy= king.xpos, king.ypos
+        king.xpos,king.ypos = king.xpos + vector[0],king.ypos + vector[1]
         blockage = False
         for piece in pieces:
             if (piece.xpos, piece.ypos) == (king.xpos, king.ypos):
-                blockage = True
+                blockage = True #blockage sees if there is a piece of the same colour at the new square
         if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,wking,bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
             continue
@@ -126,12 +124,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         if checker.name[1] == "b":
             for i in range(0, abs(king.xpos - checker.xpos)+1):
                 for piece in pieces:
-                    if piece.name[1] == "k":
-                        continue
-                    tempx = piece.xpos
-                    tempy = piece.ypos
-                    piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
-                    piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
+                    tempx, tempy = piece.xpos, piece.ypos
+                    piece.xpos, piece.ypos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i), checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                     if i == 0:
                         ap.remove(checker)
                         takenpiece = checker
@@ -159,8 +153,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
                     for piece in pieces:
-                        if piece.name[1] == "k":
-                            continue
                         tempx = piece.xpos
                         tempy = piece.ypos
                         piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
@@ -190,8 +182,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(wking.xpos - checker.xpos) + 1):
                     for piece in pieces:
-                        if piece.name[1] == "k":
-                            continue
                         tempx = piece.xpos
                         tempy = piece.ypos
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
@@ -223,8 +213,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos) + 1):
                     for piece in pieces:
-                        if piece.name[1] == "k":
-                            continue
                         tempx = piece.xpos
                         tempy = piece.ypos
                         piece.xpos = checker.xpos
@@ -237,6 +225,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             else:
                                 bp.remove(checker)
                             tempitem = checker
+                            
                         if move_valid(piece, checker.xpos, checker.ypos + (constant * i), wp, bp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
@@ -255,8 +244,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(wking.xpos - checker.xpos) + 1):
                     for piece in pieces:
-                        if piece.name[1] == "k":
-                            continue
                         tempx = piece.xpos
                         tempy = piece.ypos
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
@@ -287,8 +274,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
             else:
                 for i in range(0, abs(king.xpos - checker.xpos) + 1):
                     for piece in pieces:
-                        if piece.name[1] == "k":
-                            continue
                         tempx = piece.xpos
                         tempy = piece.ypos
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
@@ -348,8 +333,6 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                     tempitem = None
         elif checker.name[1] == "p":
             for piece in pieces:
-                if piece.name[1] == "k":
-                    continue
                 tempx = piece.xpos
                 tempy = piece.ypos
                 piece.xpos = checker.xpos
