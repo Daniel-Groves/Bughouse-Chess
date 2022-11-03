@@ -105,13 +105,13 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces): #function to check
         pieces = bp
         king = bking
         constant = -1
-
+    
+    tempx, tempy= king.xpos, king.ypos
     for vector in king_vectors: #checks if there is anywhere the king can legally move to
-        tempx, tempy= king.xpos, king.ypos
         king.xpos,king.ypos = king.xpos + vector[0],king.ypos + vector[1]
         blockage = False
         for piece in pieces:
-            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos):
+            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece != king:
                 blockage = True #blockage sees if there is a piece of the same colour at the new square
         if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,wking,bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
@@ -409,8 +409,8 @@ def check_checker(wp, bp, wking, bking):
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
-        else:
-            return False
+    else:
+        return False
 
 
 def piecethere(xsquare, ysquare, compare):
@@ -455,9 +455,11 @@ def king_moves(x, y, startx, starty, item):
     return returner
 
 
-def queen_moves(x, y, startx, starty, queen):
+def queen_moves(x, y, startx, starty, queen):    
     returner = True
-    if abs(x) == abs(y):
+    if x == 0 and y == 0:
+        returner = False
+    elif abs(x) == abs(y):
         for i in range(0, abs(x) + 1):
             if x < 0:
                 vectorx = startx - i
