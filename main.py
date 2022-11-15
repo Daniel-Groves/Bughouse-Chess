@@ -373,11 +373,13 @@ def check_checker(wp, bp, wking, bking):
         pieces = wp
         king = bking
     global piece
-
+    print(king.xpos, king.ypos)
+    #print(king.xpos,king.ypos)
     for piece in pieces:
         if piece.name[1] == "k":
             checktake = False
         elif piece.name[1] == "q":
+            print(queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece))
             checktake = queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
                 checking_pieces.append(piece)
@@ -455,7 +457,8 @@ def king_moves(x, y, startx, starty, item):
     return returner
 
 
-def queen_moves(x, y, startx, starty, queen):    
+def queen_moves(x, y, startx, starty, queen):
+    #print(f"hmmm {x,y,startx,starty}")
     returner = True
     if x == 0 and y == 0:
         returner = False
@@ -472,6 +475,7 @@ def queen_moves(x, y, startx, starty, queen):
             if abs(x) == i and piecethereexclude(vectorx, vectory, queen):
                 return True
             elif piecethere(vectorx, vectory, queen):
+                #print("okay")
                 returner = False
                 return returner
             else:
@@ -490,7 +494,7 @@ def queen_moves(x, y, startx, starty, queen):
             else:
                 returner = True
     elif x == 0:
-
+        #print("yesss")
         for i in range(1, abs(y) + 1):
             if y > 0:
                 vectory = starty + i
@@ -499,6 +503,7 @@ def queen_moves(x, y, startx, starty, queen):
             if abs(y) == i and piecethereexclude(startx, vectory, queen):
                 return True
             elif piecethere(startx, vectory, queen):
+                #print("okay")
                 returner = False
                 break
             else:

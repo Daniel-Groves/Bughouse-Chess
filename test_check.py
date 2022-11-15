@@ -49,30 +49,15 @@ board = [[" " for i in range(8)] for i in range(8)]
 def test_check():
     move = True
     wp = []
-    for i in range(1, 9):
-        wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
     wking = Piece(f"wk", 5, 8, "w", wking_image)
     wp.append(wking)
     wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
-    wp.append(Piece(f"wb1", 3, 8, "w", wbishop_image))
-    wp.append(Piece(f"wb2", 6, 8, "w", wbishop_image))
-    wp.append(Piece(f"wn1", 2, 8, "w", wknight_image))
-    wp.append(Piece(f"wn2", 7, 8, "w", wknight_image))
-    wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
-    wp.append(Piece(f"wr2", 8, 8, "w", wrook_image))
 
     bp = []
-    for i in range(1, 9):
-        bp.append(Piece(f"bp{i}", i, 2, "b", bpawn_image))
-    bking = (Piece(f"bk", 5, 1, "w", bking_image))
+    bking = (Piece(f"bk", 4, 1, "w", bking_image))
     bp.append(bking)
-    bp.append(Piece(f"bq", 4, 1, "w", bqueen_image))
-    bp.append(Piece(f"bb1", 3, 1, "w", bbishop_image))
-    bp.append(Piece(f"bb2", 6, 1, "w", bbishop_image))
-    bp.append(Piece(f"bn1", 2, 1, "w", bknight_image))
-    bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
-    bp.append(Piece(f"br1", 1, 1, "w", brook_image))
-    bp.append(Piece(f"br2", 8, 1, "w", brook_image))
+    bp.append(Piece(f"bq", 5, 1, "w", bqueen_image))
 
-    assert main.check_checker(wp, bp, wking, bking) == False
+    assert main.check_checker(wp, bp, wking, bking) is True
+
 
