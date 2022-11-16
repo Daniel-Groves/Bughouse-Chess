@@ -58,6 +58,10 @@ def test_check():
     bp.append(bking)
     bp.append(Piece(f"bq", 5, 1, "w", bqueen_image))
 
+    ap = wp + bp
+    for i in ap:
+        i.place()
+
     assert main.check_checker(wp, bp, wking, bking) is True
 
 
