@@ -63,36 +63,36 @@ def board_text(piecelist):  # function to print out a text version of the board
     print("".join([f"\n{i}" for i in board]))
 
 
-def move_valid(item, xsquare, ysquare, wp, bp, wking, bking, newposx,
+def move_valid(G,item, xsquare, ysquare, wp, bp, wking, bking, newposx,
                newposy):  # function to see which piece it is and run respective function (could clean this up and put functions in class)
     if item.name[1] == "k":
-        movevalid = king_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
+        movevalid = king_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "q":
-        movevalid = queen_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
+        movevalid = queen_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "b":
-        movevalid = bishop_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
+        movevalid = bishop_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "n":
-        movevalid = knight_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
+        movevalid = knight_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "r":
-        movevalid = rook_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
+        movevalid = rook_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[0:2] == "wp":
-        movevalid = white_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
+        movevalid = white_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid and not check_checker(wp, bp, wking, bking) and turn:
+        if movevalid and not check_checker(G,wp, bp, wking, bking) and turn:
             item.move_num += 1
             tempitem = None
     elif item.name[0:2] == "bp":
-        movevalid = black_pawn_moves(-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
+        movevalid = black_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid and not check_checker(wp, bp, wking, bking) and turn:
+        if movevalid and not check_checker(G,wp, bp, wking, bking) and turn:
             item.move_num += 1
             tempitem = None
     else:
         movevalid = True
-    return movevalid and not check_checker(wp, bp, wking, bking)
+    return movevalid and not check_checker(G,wp, bp, wking, bking)
 
 
-def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to check if it is checkmate
+def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to check if it is checkmate
     checkmate = True
     global king
     if move:  # see whose move it is in order to determine for who we are detecting checkmate
@@ -111,7 +111,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
         for piece in pieces:
             if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece != king:
                 blockage = True  # blockage sees if there is a piece of the same colour at the new square
-        if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,
+        if move_valid(G,king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(G,wp, bp,
                                                                                                             wking,
                                                                                                             bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
@@ -134,8 +134,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                         else:
                             bp.remove(checker)
                         tempitem = checker
-                    if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                  tempy) and not check_checker(wp, bp, wking, bking):
+                    if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                                  tempy) and not check_checker(G,wp, bp, wking, bking):
                         checkmate = False
                         piece.xpos = tempx
                         piece.ypos = tempy
@@ -164,8 +164,8 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                             else:
                                 bp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, checker.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                      tempy) and not check_checker(wp, bp, wking, bking):
+                        if move_valid(G,piece, checker.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                                      tempy) and not check_checker(G,wp, bp, wking, bking):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -194,7 +194,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                             else:
                                 bp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx, tempy):
+                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx, tempy):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -226,7 +226,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                                 bp.remove(checker)
                             tempitem = checker
 
-                        if move_valid(piece, checker.xpos, checker.ypos + (constant * i), wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, checker.xpos, checker.ypos + (constant * i), wp, bp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -256,7 +256,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                             else:
                                 bp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -286,7 +286,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                             else:
                                 bp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -316,7 +316,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                 else:
                     bp.remove(checker)
                 tempitem = checker
-                if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
                               tempy):
                     checkmate = False
                     piece.xpos = tempx
@@ -344,7 +344,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
                 else:
                     bp.remove(checker)
                 tempitem = checker
-                if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
                               tempy):
                     checkmate = False
                     piece.xpos = tempx
@@ -363,57 +363,61 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):  # function to che
     return checkmate
 
 
-def check_checker(wp, bp, wking, bking):
+def check_checker(G,wp, bp, wking, bking):
+
+    print(G.move)
+
     global checking_pieces
     checking_pieces = []
-    if move:
-        pieces = bp
+    if G.move:
+        pieces = G.bp
         king = wking
     else:
-        pieces = wp
+        pieces = G.wp
         king = bking
-    # print(king.xpos, king.ypos)
     for piece in pieces:
         if piece.name[1] == "k":
             checktake = False
         elif piece.name[1] == "q":
-            # print(queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece))
-            checktake = queen_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
+            #print("hellloo", piece.name)
+            #print(piece.xpos, piece.ypos, piece)
+            checktake = queen_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "b":
-            checktake = bishop_moves(king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
+            checktake = bishop_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "n":
-            checktake = knight_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
+            checktake = knight_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "r":
-            checktake = rook_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
+            checktake = rook_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "wp":
-            checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
+            checktake = white_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "bp":
-            checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
+            checktake = black_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
     else:
+        #print("yooooo")
         return False
 
 
-def piecethere(xsquare, ysquare, compare):
+def piecethere(G, xsquare, ysquare, compare):
     for i in G.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i != compare:
             return True
@@ -421,14 +425,14 @@ def piecethere(xsquare, ysquare, compare):
     return False
 
 
-def piecethereexclude(xsquare, ysquare, compare):
+def piecethereexclude(G,xsquare, ysquare, compare):
     for i in G.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != compare.name[0]:
             return True
     return False
 
 
-def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
+def takenpiecechecker(G,takenpiece, xsquare, ysquare, compare):
     if not takenpiece:
         return False
     if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name != compare.name:
@@ -438,8 +442,8 @@ def takenpiecechecker(takenpiece, xsquare, ysquare, compare):
         return False
 
 
-def king_moves(x, y, startx, starty, item):
-    if abs(x) < 2 and abs(y) < 2 and not piecethere(startx + x, starty + y, item):
+def king_moves(G,x, y, startx, starty, item):
+    if abs(x) < 2 and abs(y) < 2 and not piecethere(G,startx + x, starty + y, item):
         returner = True
         for vector in king_vectors:
             if item.name[0] == "w":
@@ -455,7 +459,9 @@ def king_moves(x, y, startx, starty, item):
     return returner
 
 
-def queen_moves(x, y, startx, starty, queen):
+def queen_moves(G,x, y, startx, starty, queen):
+    #print(x,y,startx,starty)
+    #print("queen")
     # print(f"hmmm {x,y,startx,starty}")
     returner = True
     if x == 0 and y == 0:
@@ -470,9 +476,9 @@ def queen_moves(x, y, startx, starty, queen):
                 vectory = starty - i
             elif y > 0:
                 vectory = starty + i
-            if abs(x) == i and piecethereexclude(vectorx, vectory, queen):
+            if abs(x) == i and piecethereexclude(G,vectorx, vectory, queen):
                 return True
-            elif piecethere(vectorx, vectory, queen):
+            elif piecethere(G,vectorx, vectory, queen):
                 # print("okay")
                 returner = False
                 return returner
@@ -484,23 +490,23 @@ def queen_moves(x, y, startx, starty, queen):
                 vectorx = startx + i
             if x < 0:
                 vectorx = startx - i
-            if abs(x) == i and piecethereexclude(vectorx, starty, queen):
+            if abs(x) == i and piecethereexclude(G,vectorx, starty, queen):
                 return True
-            elif piecethere(vectorx, starty, queen):
+            elif piecethere(G,vectorx, starty, queen):
                 returner = False
                 break
             else:
                 returner = True
     elif x == 0:
-        # print("yesss")
+        print("yesss")
         for i in range(1, abs(y) + 1):
             if y > 0:
                 vectory = starty + i
             if y < 1:
                 vectory = starty - i
-            if abs(y) == i and piecethereexclude(startx, vectory, queen):
+            if abs(y) == i and piecethereexclude(G,startx, vectory, queen):
                 return True
-            elif piecethere(startx, vectory, queen):
+            elif piecethere(G,startx, vectory, queen):
                 # print("okay")
                 returner = False
                 break
@@ -511,7 +517,7 @@ def queen_moves(x, y, startx, starty, queen):
     return returner
 
 
-def bishop_moves(x, y, startx, starty, bishop):
+def bishop_moves(G,x, y, startx, starty, bishop):
     global returner
     if abs(x) == abs(y):
         for i in range(1, abs(x) + 1):
@@ -524,9 +530,9 @@ def bishop_moves(x, y, startx, starty, bishop):
             elif y > 0:
                 vectory = starty + i
 
-            if abs(x) == i and piecethereexclude(vectorx, vectory, bishop):
+            if abs(x) == i and piecethereexclude(G,vectorx, vectory, bishop):
                 return True
-            elif piecethere(vectorx, vectory, bishop):
+            elif piecethere(G,vectorx, vectory, bishop):
                 returner = False
                 return returner
             else:
@@ -536,15 +542,15 @@ def bishop_moves(x, y, startx, starty, bishop):
     return returner
 
 
-def knight_moves(x, y, startx, starty, knight):
+def knight_moves(G,x, y, startx, starty, knight):
     if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
-        if piecethereexclude(startx + x, starty + y, knight) or not piecethere(startx + x, starty + y, knight):
+        if piecethereexclude(G,startx + x, starty + y, knight) or not piecethere(G,startx + x, starty + y, knight):
             return True
     else:
         return False
 
 
-def rook_moves(x, y, startx, starty, rook):
+def rook_moves(G,x, y, startx, starty, rook):
     if x == 0 or y == 0:
         if y == 0:
             for i in range(1, abs(x) + 1):
@@ -552,9 +558,9 @@ def rook_moves(x, y, startx, starty, rook):
                     vectorx = startx + i
                 if x < 0:
                     vectorx = startx - i
-                if abs(x) == i and piecethereexclude(vectorx, starty, rook):
+                if abs(x) == i and piecethereexclude(G,vectorx, starty, rook):
                     return True
-                elif piecethere(vectorx, starty, rook):
+                elif piecethere(G,vectorx, starty, rook):
                     returner = False
                     break
                 else:
@@ -566,9 +572,9 @@ def rook_moves(x, y, startx, starty, rook):
                     vectory = starty + i
                 if y < 1:
                     vectory = starty - i
-                if abs(y) == i and piecethereexclude(startx, vectory, rook):
+                if abs(y) == i and piecethereexclude(G,startx, vectory, rook):
                     return True
-                elif piecethere(startx, vectory, rook):
+                elif piecethere(G,startx, vectory, rook):
                     returner = False
                     break
                 else:
@@ -578,23 +584,23 @@ def rook_moves(x, y, startx, starty, rook):
     return returner
 
 
-def white_pawn_moves(x, y, startx, starty, first, wpa, takenpiece):
-    if x == 0 and y == -1 and not piecethere(startx, starty - 1, wpa):
+def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece):
+    if x == 0 and y == -1 and not piecethere(G,startx, starty - 1, wpa):
         return True
-    elif abs(x) == 1 and y == -1 and takenpiecechecker(takenpiece, startx + x, starty - 1, wpa):
+    elif abs(x) == 1 and y == -1 and takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa):
         return True
-    elif x == 0 and y == -2 and not piecethere(startx + x, starty - 1, wpa) and first == 0:
+    elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 1, wpa) and first == 0:
         return True
     else:
         return False
 
 
-def black_pawn_moves(x, y, startx, starty, first, bpa, takenpiece):
-    if x == 0 and y == 1 and not piecethere(startx, starty + 1, bpa):
+def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
+    if x == 0 and y == 1 and not piecethere(G,startx, starty + 1, bpa):
         return True
-    elif abs(x) == 1 and y == 1 and takenpiecechecker(takenpiece, startx + x, starty + 1, bpa):
+    elif abs(x) == 1 and y == 1 and takenpiecechecker(G,takenpiece, startx + x, starty + 1, bpa):
         return True
-    elif x == 0 and y == 2 and not piecethere(startx + x, starty + 1, bpa) and first == 0:
+    elif x == 0 and y == 2 and not piecethere(G,startx + x, starty + 1, bpa) and first == 0:
         return True
     else:
         return False
@@ -622,10 +628,11 @@ class Piece:
         board[self.ypos - 1][self.xpos - 1] = self.name
 
 class Game:
-    def __init__(self,wp,bp):
+    def __init__(self,wp,bp, move):
         self.wp = wp
         self.bp = bp
         self.ap = wp + bp
+        self.move = move
 
 if __name__ == "__main__":
     wp = []
@@ -749,9 +756,9 @@ while __name__ == "__main__":
                         else:
                             bp.remove(i)
                         tempitem = i
-                if item.name[0] == "w" and move:
+                if item.name[0] == "w" and G.move:
                     turn = True
-                elif item.name[0] == "b" and not move:
+                elif item.name[0] == "b" and not G.move:
                     turn = True
                 else:
                     turn = False
@@ -772,7 +779,7 @@ while __name__ == "__main__":
                         else:
                             bp.append(tempitem)
                 if movevalid and turn:
-                    move = not move
+                    G.move = not G.move
                     for i in G.ap:
                         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
                             G.ap.remove(i)
