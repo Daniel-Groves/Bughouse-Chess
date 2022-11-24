@@ -1,11 +1,11 @@
-def check_checker(wp, bp, wking, bking):
+def check_checker(game.wpwp, game.wpwp, wking, bking):
     global checking_pieces
     checking_pieces = []
     if move:
-        pieces = bp
+        pieces = game.wpwp
         king = wking
     else:
-        pieces = wp
+        pieces = game.wpwp
         king = bking
     global piece
 
@@ -32,13 +32,13 @@ def check_checker(wp, bp, wking, bking):
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
-        elif piece.name[0:2] == "wp":
+        elif piece.name[0:2] == "game.wpwp":
             checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
-        elif piece.name[0:2] == "bp":
+        elif piece.name[0:2] == "game.wpwp":
             checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
@@ -47,14 +47,14 @@ def check_checker(wp, bp, wking, bking):
         else:
             return False
 
-def checkmate_checker(wp, bp, wking, bking, checking_pieces):
+def checkmate_checker(game.wpwp, game.wpwp, wking, bking, checking_pieces):
     checkmate = True
     if move:
-        pieces = wp
+        pieces = game.wpwp
         king = wking
         constant = 1
     else:
-        pieces = bp
+        pieces = game.wpwp
         king = bking
         constant = -1
 
@@ -67,7 +67,7 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
         for piece in pieces:
             if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece.name[0] != king.name[0]:
                 blockage = True
-        if move_valid(king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(wp, bp,
+        if move_valid(king, king.xpos, king.ypos, game.wpwp, game.wpwp, wking, bking, tempx, tempy) and not check_checker(game.wpwp, game.wpwp,
                                                                                                             wking,
                                                                                                             bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
@@ -88,12 +88,12 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         ap.remove(checker)
                         takenpiece = checker
                         if checker.name[0] == "w":
-                            wp.remove(checker)
+                            game.wpwp.remove(checker)
                         else:
-                            bp.remove(checker)
+                            game.wpwp.remove(checker)
                         tempitem = checker
-                    if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                  tempy) and not check_checker(wp, bp, wking, bking):
+                    if move_valid(piece, piece.xpos, piece.ypos, game.wpwp, game.wpwp, wking, bking, tempx,
+                                  tempy) and not check_checker(game.wpwp, game.wpwp, wking, bking):
                         checkmate = False
                         piece.xpos = tempx
                         piece.ypos = tempy
@@ -103,9 +103,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                     if tempitem:
                         ap.append(tempitem)
                         if tempitem.name[0] == "w":
-                            wp.append(tempitem)
+                            game.wpwp.append(tempitem)
                         else:
-                            bp.append(tempitem)
+                            game.wpwp.append(tempitem)
                         tempitem = None
         elif checker.name[1] == "r":
             if checker.xpos - king.xpos == 0:
@@ -120,12 +120,12 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
-                                wp.remove(checker)
+                                game.wpwp.remove(checker)
                             else:
-                                bp.remove(checker)
+                                game.wpwp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, checker.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                      tempy) and not check_checker(wp, bp, wking, bking):
+                        if move_valid(piece, checker.xpos, piece.ypos, game.wpwp, game.wpwp, wking, bking, tempx,
+                                      tempy) and not check_checker(game.wpwp, game.wpwp, wking, bking):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -135,9 +135,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
-                                wp.append(tempitem)
+                                game.wpwp.append(tempitem)
                             else:
-                                bp.append(tempitem)
+                                game.wpwp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(wking.xpos - checker.xpos) + 1):
@@ -152,11 +152,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
-                                wp.remove(checker)
+                                game.wpwp.remove(checker)
                             else:
-                                bp.remove(checker)
+                                game.wp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx, tempy):
+                        if move_valid(piece, piece.xpos, piece.ypos, game.wp, game.wp, wking, bking, tempx, tempy):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -166,9 +166,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
-                                wp.append(tempitem)
+                                game.wp.append(tempitem)
                             else:
-                                bp.append(tempitem)
+                                game.wp.append(tempitem)
                             tempitem = None
             pass
         elif checker.name[1] == "q":
@@ -185,11 +185,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
-                                wp.remove(checker)
+                                game.wp.remove(checker)
                             else:
-                                bp.remove(checker)
+                                game.wp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, checker.xpos, checker.ypos + (constant * i), wp, bp, wking, bking, tempx,
+                        if move_valid(piece, checker.xpos, checker.ypos + (constant * i), game.wp, game.wp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -200,9 +200,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
-                                wp.append(tempitem)
+                                game.wp.append(tempitem)
                             else:
-                                bp.append(tempitem)
+                                game.wp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(wking.xpos - checker.xpos) + 1):
@@ -217,11 +217,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
-                                wp.remove(checker)
+                                game.wp.remove(checker)
                             else:
-                                bp.remove(checker)
+                                game.wp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(piece, piece.xpos, piece.ypos, game.wp, game.wp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -232,9 +232,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
-                                wp.append(tempitem)
+                                game.wp.append(tempitem)
                             else:
-                                bp.append(tempitem)
+                                game.wp.append(tempitem)
                             tempitem = None
             else:
                 for i in range(0, abs(king.xpos - checker.xpos) + 1):
@@ -249,11 +249,11 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                             ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
-                                wp.remove(checker)
+                                game.wp.remove(checker)
                             else:
-                                bp.remove(checker)
+                                game.wp.remove(checker)
                             tempitem = checker
-                        if move_valid(piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(piece, piece.xpos, piece.ypos, game.wp, game.wp, wking, bking, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -264,9 +264,9 @@ def checkmate_checker(wp, bp, wking, bking, checking_pieces):
                         if tempitem:
                             ap.append(tempitem)
                             if tempitem.name[0] == "w":
-                                wp.append(tempitem)
+                                game.wp.append(tempitem)
                             else:
-                                bp.append(tempitem)
+                                game.wp.append(tempitem)
                             tempitem = None
             pass
         checking_pieces = None

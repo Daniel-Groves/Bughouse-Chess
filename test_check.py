@@ -3,22 +3,22 @@ import main
 import pygame
 
 
-wqueen_image = pygame.image.load(r"Images\wqueen.png")
-wbishop_image = pygame.image.load(r"Images\wbishop.png")
-wknight_image = pygame.image.load(r"Images\wknight.png")
-wrook_image = pygame.image.load(r"Images\wrook.png")
-wpawn_image = pygame.image.load(r"Images\wpawn.png")
+wqueen_image = pygame.wpimage.load(r"Images\wqueen.png")
+wbishop_image = pygame.wpimage.load(r"Images\wbishop.png")
+wknight_image = pygame.wpimage.load(r"Images\wknight.png")
+wrook_image = pygame.wpimage.load(r"Images\wrook.png")
+wpawn_image = pygame.wpimage.load(r"Images\game.wpwpawn.png")
 
-bking_image = pygame.image.load(r"Images\bking.png")
-bqueen_image = pygame.image.load(r"Images\bqueen.png")
-bbishop_image = pygame.image.load(r"Images\bbishop.png")
-bknight_image = pygame.image.load(r"Images\bknight.png")
-brook_image = pygame.image.load(r"Images\brook.png")
-bpawn_image = pygame.image.load(r"Images\bpawn.png")
+bking_image = pygame.wpimage.load(r"Images\bking.png")
+bqueen_image = pygame.wpimage.load(r"Images\bqueen.png")
+bbishop_image = pygame.wpimage.load(r"Images\bbishop.png")
+bknight_image = pygame.wpimage.load(r"Images\bknight.png")
+brook_image = pygame.wpimage.load(r"Images\brook.png")
+game.wpwpawn_image = pygame.wpimage.load(r"Images\game.wpwpawn.png")
 
-board_image = pygame.image.load(
+board_image = pygame.wpimage.load(
     r"Images\board.png")
-wking_image = pygame.image.load(
+wking_image = pygame.wpimage.load(
     r"Images\wking.png").convert_alpha()
 
 class Piece:
@@ -42,6 +42,13 @@ class Piece:
     def place(self):
         board[self.ypos - 1][self.xpos - 1] = self.name
 
+class Game:
+    def __init__(self,wp,bp):
+        self.wp = wp
+        self.bp = bp
+        self.ap = wp + bp
+
+
 board = [[" " for i in range(8)] for i in range(8)]
 
 
@@ -56,12 +63,10 @@ def test_check():
     bp = []
     bking = (Piece(f"bk", 4, 1, "w", bking_image))
     bp.append(bking)
-    bp.append(Piece(f"bq", 5, 1, "w", bqueen_image))
+    bpp.append(Piece(f"bq", 5, 1, "w", bqueen_image))
 
-    ap = wp + bp
-    for i in ap:
-        i.place()
+    G = Game(wp,bp)
 
-    assert main.check_checker(wp, bp, wking, bking) is True
+    assert main.check_checker(ap, game.wpwp, game.wpwp, wking, bking) is True
 
 
