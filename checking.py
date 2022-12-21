@@ -2,10 +2,10 @@ def check_checker(game.wpwp, game.wpwp, wking, bking):
     global checking_pieces
     checking_pieces = []
     if move:
-        pieces = game.wpwp
+        pieces = game.bp
         king = wking
     else:
-        pieces = game.wpwp
+        pieces = game.wp
         king = bking
     global piece
 
@@ -32,13 +32,13 @@ def check_checker(game.wpwp, game.wpwp, wking, bking):
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
-        elif piece.name[0:2] == "game.wpwp":
+        elif piece.name[0:2] == "wp":
             checktake = white_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
                 checking_pieces.append(piece)
                 return checktake
-        elif piece.name[0:2] == "game.wpwp":
+        elif piece.name[0:2] == "bp":
             checktake = black_pawn_moves(piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
