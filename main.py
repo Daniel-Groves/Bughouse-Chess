@@ -63,7 +63,7 @@ def board_text(piecelist):  # function to print out a text version of the board
     print("".join([f"\n{i}" for i in board]))
 
 
-def move_valid(G,item, xsquare, ysquare, wp, bp, wking, bking, newposx,
+def move_valid(G,item, xsquare, ysquare,newposx,
                newposy):  # function to see which piece it is and run respective function (could clean this up and put functions in class)
     if item.name[1] == "k":
         movevalid = king_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
@@ -78,30 +78,31 @@ def move_valid(G,item, xsquare, ysquare, wp, bp, wking, bking, newposx,
     elif item.name[0:2] == "wp":
         movevalid = white_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid and not check_checker(G,wp, bp, wking, bking) and turn:
+        if movevalid and not check_checker(G) and turn:
             item.move_num += 1
             tempitem = None
     elif item.name[0:2] == "bp":
         movevalid = black_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
-        if movevalid and not check_checker(G,wp, bp, wking, bking) and turn:
+        if movevalid and not check_checker(G) and turn:
             item.move_num += 1
             tempitem = None
     else:
         movevalid = True
-    return movevalid and not check_checker(G,wp, bp, wking, bking)
+    return movevalid and not check_checker(G)
 
 
-def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to check if it is checkmate
+def checkmate_checker(G):  # function to check if it is checkmate
+    print([i.name for i in G.checking_pieces])
     checkmate = True
     global king
     if move:  # see whose move it is in order to determine for who we are detecting checkmate
         pieces = G.bp
-        king = wking
+        king = G.bking
         constant = 1
     else:
         pieces = G.wp
-        king = bking
+        king = G.wking
         constant = -1
 
     tempx, tempy = king.xpos, king.ypos
@@ -111,31 +112,31 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
         for piece in pieces:
             if (piece.xpos, piece.ypos) == (king.xpos, king.ypos) and piece != king:
                 blockage = True  # blockage sees if there is a piece of the same colour at the new square
-        if move_valid(G,king, king.xpos, king.ypos, wp, bp, wking, bking, tempx, tempy) and not check_checker(G,wp, bp,
-                                                                                                            wking,
-                                                                                                            bking) and king.xpos > 0 and king.ypos > 0 and not blockage:
+        if move_valid(G,king, king.xpos, king.ypos, tempx, tempy) and not check_checker(G) and king.xpos > 0 and king.ypos > 0 and not blockage:
             checkmate = False
             continue
         king.xpos = tempx
         king.ypos = tempy
 
-    for checker in checking_pieces:
+    for checker in G.checking_pieces:
+        print(checker.name)
         if checker.name[1] == "b":
+            #print(checker.name)
             for i in range(0, abs(king.xpos - checker.xpos) + 1):
                 for piece in pieces:
                     tempx, tempy = piece.xpos, piece.ypos
                     piece.xpos, piece.ypos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i), checker.ypos + (
                                 numpy.sign(king.ypos - checker.ypos) * i)
                     if i == 0:
-                        G.remove(checker)
+                        G.ap.remove(checker)
                         takenpiece = checker
                         if checker.name[0] == "w":
                             G.wp.remove(checker)
                         else:
                             G.bp.remove(checker)
                         tempitem = checker
-                    if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                  tempy) and not check_checker(G,wp, bp, wking, bking):
+                    if move_valid(G,piece, piece.xpos, piece.ypos, tempx,
+                                  tempy) and not check_checker(G):
                         checkmate = False
                         piece.xpos = tempx
                         piece.ypos = tempy
@@ -150,6 +151,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                             G.bp.append(tempitem)
                         tempitem = None
         elif checker.name[1] == "r":
+
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
                     for piece in pieces:
@@ -164,8 +166,8 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                             else:
                                 G.bp.remove(checker)
                             tempitem = checker
-                        if move_valid(G,piece, checker.xpos, piece.ypos, wp, bp, wking, bking, tempx,
-                                      tempy) and not check_checker(G,wp, bp, wking, bking):
+                        if move_valid(G,piece, checker.xpos, piece.ypos, tempx,
+                                      tempy) and not check_checker(G):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -180,10 +182,10 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                                 G.bp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
-                for i in range(0, abs(wking.xpos - checker.xpos) + 1):
+                for i in range(0, abs(king.xpos - checker.xpos) + 1):
                     for piece in pieces:
                         tempx = piece.xpos
-                        tempy = piece.ypos
+                        tempy = piece.yposr
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
                         piece.ypos = checker.ypos
                         if i == 0:
@@ -194,7 +196,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                             else:
                                 G.bp.remove(checker)
                             tempitem = checker
-                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx, tempy):
+                        if move_valid(G,piece, piece.xpos, piece.ypos, tempx, tempy):
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -226,7 +228,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                                 G.bp.remove(checker)
                             tempitem = checker
 
-                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, piece.xpos, piece.ypos, tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -242,7 +244,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                                 G.bp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
-                for i in range(0, abs(wking.xpos - checker.xpos) + 1):
+                for i in range(0, abs(king.xpos - checker.xpos) + 1):
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
@@ -256,7 +258,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                             else:
                                 G.bp.remove(checker)
                             tempitem = checker
-                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                                       tempy):
                             checkmate = False
                             piece.xpos = tempx
@@ -286,9 +288,8 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                             else:
                                 G.bp.remove(checker)
                             tempitem = checker
-                        if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                        if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                                       tempy):
-                            print(piece.name)
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -317,7 +318,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                 else:
                     G.bp.remove(checker)
                 tempitem = checker
-                if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                               tempy):
                     checkmate = False
                     piece.xpos = tempx
@@ -345,7 +346,7 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                 else:
                     G.bp.remove(checker)
                 tempitem = checker
-                if move_valid(G,piece, piece.xpos, piece.ypos, wp, bp, wking, bking, tempx,
+                if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                               tempy):
                     checkmate = False
                     piece.xpos = tempx
@@ -360,22 +361,21 @@ def checkmate_checker(G,wp, bp, wking, bking, checking_pieces):  # function to c
                     else:
                         G.bp.append(tempitem)
                     tempitem = None
-        checking_pieces = None
+        G.checking_pieces = []
     return checkmate
 
 
-def check_checker(G,wp, bp, wking, bking):
+def check_checker(G):
+    print([i.name for i in G.checking_pieces])
 
     #print(G.move)
 
-    global checking_pieces
-    checking_pieces = []
     if G.move:
         pieces = G.bp
-        king = wking
+        king = G.wking
     else:
         pieces = G.wp
-        king = bking
+        king = G.bking
     for piece in pieces:
         if piece.name[1] == "k":
             checktake = False
@@ -384,34 +384,35 @@ def check_checker(G,wp, bp, wking, bking):
             #print(piece.xpos, piece.ypos, piece)
             checktake = queen_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "b":
             checktake = bishop_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
+                print("adding")
                 return checktake
         elif piece.name[1] == "n":
             checktake = knight_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "r":
             checktake = rook_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos, piece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "wp":
             checktake = white_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "bp":
             checktake = black_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, king.xpos, king.ypos,
                                          piece.move_num, piece, takenpiece)
             if checktake:
-                checking_pieces.append(piece)
+                G.checking_pieces.append(piece)
                 return checktake
     else:
         #print("yooooo")
@@ -448,11 +449,11 @@ def king_moves(G,x, y, startx, starty, item):
         returner = True
         for vector in king_vectors:
             if item.name[0] == "w":
-                if bking.xpos == startx + x + vector[0] and bking.ypos == starty + y + vector[1]:
+                if G.bking.xpos == startx + x + vector[0] and G.bking.ypos == starty + y + vector[1]:
                     returner = False
                     break
             else:
-                if wking.xpos == startx + x + vector[0] and wking.ypos == starty + y + vector[1]:
+                if G.wking.xpos == startx + x + vector[0] and G.wking.ypos == starty + y + vector[1]:
                     returner = False
                     break
     else:
@@ -628,40 +629,58 @@ class Piece:
         board[self.ypos - 1][self.xpos - 1] = self.name
 
 class Game:
-    def __init__(self,wp,bp, move=True):
+    def __init__(self,wp,bp, move, wking, bking, checking_pieces=[]):
         self.wp = wp
         self.bp = bp
         self.ap = wp + bp
         self.move = move
+        self.wking = wking
+        self.bking = bking
+        self.checking_pieces = checking_pieces
 
 if __name__ == "__main__":
     wp = []
-    for i in range(1, 9):
-        wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
-    wking = Piece(f"wk", 5, 8, "w", wking_image)
-    wp.append(wking)
-    wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
-    wp.append(Piece(f"wb1", 3, 8, "w", wbishop_image))
-    wp.append(Piece(f"wb2", 6, 8, "w", wbishop_image))
-    wp.append(Piece(f"wn1", 2, 8, "w", wknight_image))
-    wp.append(Piece(f"wn2", 7, 8, "w", wknight_image))
-    wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
-    wp.append(Piece(f"wr2", 8, 8, "w", wrook_image))
-
     bp = []
-    for i in range(1, 9):
-        bp.append(Piece(f"bp{i}", i, 2, "b", bpawn_image))
+
+    wking = Piece(f"wk", 7, 8, "w", wking_image)
+    wp.append(wking)
+
+    wp.append(Piece(f"wp1", 1, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp2", 2, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp3", 3, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp4", 4, 6, "w", wpawn_image))
+    wp.append(Piece(f"wp5", 6, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp6", 7, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp7", 8, 7, "w", wpawn_image))
+    wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
+    wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
+    wp.append(Piece(f"wr2", 6, 8, "w", wrook_image))
+    wp.append(Piece(f"wn1", 3, 6, "w", wpawn_image))
+    wp.append(Piece(f"wn2", 6, 6, "w", wpawn_image))
+    wp.append(Piece(f"wb1", 3, 8, "w", wbishop_image))
+    wp.append(Piece(f"wb2", 2, 4, "w", wbishop_image))
+
+    bp.append(Piece(f"bp1", 1, 2, "b", bpawn_image))
+    bp.append(Piece(f"bp2", 2, 2, "b", bpawn_image))
+    bp.append(Piece(f"bp3", 3, 4, "b", bpawn_image))
+    bp.append(Piece(f"bp4", 6, 2, "b", bpawn_image))
+    bp.append(Piece(f"bp5", 7, 2, "b", bpawn_image))
+    bp.append(Piece(f"bp5", 8, 2, "b", bpawn_image))
+    bp.append(Piece(f"bq", 4, 1, "b", bqueen_image))
+    bp.append(Piece(f"br1", 1, 1, "b", brook_image))
+    bp.append(Piece(f"br2", 8, 1, "b", brook_image))
+    bp.append(Piece(f"bb1", 3, 1, "b", bbishop_image))
+    bp.append(Piece(f"bb2", 6, 3, "b", bbishop_image))
+    bp.append(Piece(f"bn2", 3, 3, "b", bknight_image))
+
     bking = (Piece(f"bk", 5, 1, "w", bking_image))
     bp.append(bking)
-    bp.append(Piece(f"bq", 4, 1, "w", bqueen_image))
-    bp.append(Piece(f"bb1", 3, 1, "w", bbishop_image))
-    bp.append(Piece(f"bb2", 6, 1, "w", bbishop_image))
-    bp.append(Piece(f"bn1", 2, 1, "w", bknight_image))
-    bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
-    bp.append(Piece(f"br1", 1, 1, "w", brook_image))
-    bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
-    G = Game(wp, bp)
+
+
+    G = Game(wp, bp, True, wking, bking)
+
+
 
 if __name__ == "__main__":
     pygame.init()
@@ -698,9 +717,8 @@ while __name__ == "__main__":
     clock.tick(120)
     screen.fill(white)
     # print(check_checker(wp, bp, wking, bking))
-    if check_checker(G,wp, bp, wking, bking):
-        print("yes")
-        if checkmate_checker(G,wp, bp, wking, bking, checking_pieces):
+    if check_checker(G):
+        if checkmate_checker(G):
             print("CHECKMATE")
             time.sleep(1000)
     for event in pygame.event.get():
@@ -764,7 +782,7 @@ while __name__ == "__main__":
                 else:
                     turn = False
 
-                movevalid = move_valid(G,item, xsquare, ysquare, wp, bp, wking, bking, newposx, newposy)
+                movevalid = move_valid(G,item, xsquare, ysquare, newposx, newposy)
 
                 if movevalid and turn:
                     tempitem = None

@@ -43,17 +43,20 @@ class Piece:
         board[self.ypos - 1][self.xpos - 1] = self.name
 
 class Game:
-    def __init__(self,wp,bp, move):
+    def __init__(self,wp,bp, move, wking, bking, checking_pieces=[]):
         self.wp = wp
         self.bp = bp
         self.ap = wp + bp
         self.move = move
+        self.wking = wking
+        self.bking = bking
+        self.checking_pieces = checking_pieces
 
 
 board = [[" " for i in range(8)] for i in range(8)]
 
 @pytest.mark.parametrize("wking,bking,wp, bp, expected_result, move", [
-    (Piece(f"wk", 7, 8, "w", wking_image),
+    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 1
         Piece(f"bk", 7, 2, "w", bking_image),
         [Piece(f"wk", 7, 8, "w", wking_image),
          Piece(f"wb1", 3, 8, "w", wbishop_image),
@@ -74,31 +77,133 @@ board = [[" " for i in range(8)] for i in range(8)]
          Piece(f"bp3", 1, 3, "b", bpawn_image)],
         False,
         False),
+    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 2
+        Piece(f"bk", 5, 1, "b", bking_image),
+        [Piece(f"wk", 7, 8, "w", wking_image),
+         Piece(f"wp1", 1, 7, "w", wpawn_image),
+        Piece(f"wp2", 2, 7, "w", wpawn_image),
+        Piece(f"wp3", 3, 7, "w", wpawn_image),
+        Piece(f"wp4", 4, 6, "w", wpawn_image),
+        Piece(f"wp5", 6, 7, "w", wpawn_image),
+        Piece(f"wp6", 7, 6, "w", wpawn_image),
+        Piece(f"wp7", 8, 7, "w", wpawn_image),
+        Piece(f"wq", 6, 8, "w", wqueen_image),
+        Piece(f"wr1", 1, 8, "w", wrook_image),
+        Piece(f"wn1", 3, 4, "w", wpawn_image),
+     ],
+     [  Piece(f"bk", 5, 1, "b", bking_image),
+        Piece(f"bp1", 1, 2, "b", bpawn_image),
+        Piece(f"bp2", 3, 3, "b", bpawn_image),
+        Piece(f"bp3", 6, 2, "b", bpawn_image),
+        Piece(f"bp4", 7, 2, "b", bpawn_image),
+        Piece(f"bp5", 8, 2, "b", bpawn_image),
+        Piece(f"bq", 7, 4, "b", bqueen_image),
+        Piece(f"br1", 1, 1, "b", brook_image),
+        Piece(f"br2", 8, 1, "b", brook_image),
+        Piece(f"bn1", 7, 1, "b", bpawn_image)],
+     False,
+     True
+     ),
+    (Piece(f"wk", 2, 7, "w", wking_image), #TEST CASE 3
+        Piece(f"bk", 7, 1, "b", bking_image),
+        [Piece(f"wk", 2, 7, "w", wking_image),
+        Piece(f"wq", 5, 4, "w", wqueen_image),
+        Piece(f"wb1", 4, 3, "w", wbishop_image),
+     ],
+     [  Piece(f"bk", 7, 1, "b", bking_image),
+        Piece(f"bp1", 2, 5, "b", bpawn_image),
+        Piece(f"bp2", 6, 2, "b", bpawn_image),
+        Piece(f"bp3", 8, 2, "b", bpawn_image),
+        Piece(f"bq", 2, 1, "b", bqueen_image)],
+     False,
+     False
+    ),
     (Piece(f"wk", 8, 1, "w", wking_image), #TEST CASE 4
         Piece(f"bk", 6, 3, "b", bking_image),
         [Piece(f"wk", 8, 1, "w", wking_image),
          Piece(f"wp1", 8, 2, "w", wpawn_image),
-        Piece(f"wp1", 7, 2, "w", wpawn_image)],
+        Piece(f"wp2", 7, 2, "w", wpawn_image)],
         [Piece(f"bk", 6, 3, "b", bking_image),
         Piece(f"bb1", 1, 8, "b", bbishop_image),
         Piece(f"bn1", 8, 3, "b", bknight_image)],
         False,
-        True)
+        True),
+    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 5
+        Piece(f"bk", 5, 1, "b", bking_image),
+        [Piece(f"wk", 7, 8, "w", wking_image),
+         Piece(f"wp1", 1, 7, "w", wpawn_image),
+        Piece(f"wp2", 2, 7, "w", wpawn_image),
+        Piece(f"wp3", 3, 7, "w", wpawn_image),
+        Piece(f"wp4", 4, 6, "w", wpawn_image),
+        Piece(f"wp5", 6, 7, "w", wpawn_image),
+        Piece(f"wp6", 7, 7, "w", wpawn_image),
+        Piece(f"wp7", 8, 7, "w", wpawn_image),
+        Piece(f"wq", 4, 8, "w", wqueen_image),
+        Piece(f"wr1", 1, 8, "w", wrook_image),
+        Piece(f"wr2", 6, 8, "w", wrook_image),
+        Piece(f"wn1", 3, 6, "w", wpawn_image),
+        Piece(f"wn2", 6, 6, "w", wpawn_image),
+         Piece(f"wb1", 3, 8, "w", wbishop_image),
+         Piece(f"wb2", 3, 3, "w", wbishop_image)
+     ],
+     [  Piece(f"bk", 5, 1, "b", bking_image),
+        Piece(f"bp1", 1, 2, "b", bpawn_image),
+        Piece(f"bp2", 2, 2, "b", bpawn_image),
+        Piece(f"bp3", 3, 4, "b", bpawn_image),
+        Piece(f"bp4", 6, 2, "b", bpawn_image),
+        Piece(f"bp5", 7, 2, "b", bpawn_image),
+        Piece(f"bp6", 8, 2, "b", bpawn_image),
+        Piece(f"bq", 4, 1, "b", bqueen_image),
+        Piece(f"br1", 1, 1, "b", brook_image),
+        Piece(f"br2", 8, 1, "b", brook_image),
+        Piece(f"bn1", 7, 1, "b", bpawn_image),
+        Piece(f"bb1", 3, 1, "b", bbishop_image),
+        Piece(f"bb2", 6, 3, "b", bbishop_image)],
+     False,
+     False
+    ),
+    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 7
+        Piece(f"bk", 1, 5, "b", bking_image),
+        [Piece(f"wk", 7, 8, "w", wking_image),
+         Piece(f"wp1", 6, 7, "w", wpawn_image),
+        Piece(f"wp2", 7, 7, "w", wpawn_image),
+        Piece(f"wp3", 8, 6, "w", wpawn_image),
+        Piece(f"wq", 2,5, "w", wqueen_image),
+        Piece(f"wr1", 3, 8, "w", wrook_image),
+        Piece(f"wn1", 4, 4, "w", wpawn_image),
+        Piece(f"wn2", 6, 2, "w", wpawn_image),
+     ],
+     [  Piece(f"bk", 1, 5, "b", bking_image),
+        Piece(f"bp1", 1, 2, "b", bpawn_image),
+        Piece(f"bp2", 1, 3, "b", bpawn_image),
+        Piece(f"bp3", 6, 3, "b", bpawn_image),
+        Piece(f"bp4", 8, 2, "b", bpawn_image),
+        Piece(f"br1", 1, 7, "b", brook_image),
+    ],
+     True,
+     False
+    )
 
     ])
 
 
 def test_check(wking,bking,wp,bp,expected_result,move):
+    t = [[" " for i in range(8)] for i in range(8)]
+    G = Game(wp, bp, move, wking, bking, [])
 
-
-    G = Game(wp, bp, move)
-
+    print(G.checking_pieces)
 
     for piece in G.ap:
-        piece.place()
-    print("".join([f"\n{i}" for i in board]))
+        print(piece.name, piece.xpos, piece.ypos)
+        t[piece.ypos - 1][piece.xpos - 1] = piece.name
+    print("".join([f"\n{i}" for i in t]))
 
-    assert main.check_checker(G, G.wp, G.wp, wking, bking) is expected_result
+
+    print(G.checking_pieces)
+
+    if main.check_checker(G) is True:
+        assert main.checkmate_checker(G) is expected_result
+
 
 
 
