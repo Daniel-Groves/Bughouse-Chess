@@ -3,30 +3,10 @@ import pygame
 import socket
 import pickle
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
-
-x=[]
-
-global data
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            print(f"dat1 {data}")
-            recieved= pickle.loads(data)
-            conn.sendall(data)
 
 
 
-print(f"x{recieved}")
+
 
 
 pygame.init()
@@ -68,6 +48,28 @@ bbishop_image = pygame.transform.scale(bbishop_image, image_constant)
 bknight_image = pygame.transform.scale(bknight_image, image_constant)
 brook_image = pygame.transform.scale(brook_image, image_constant)
 bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
+
+def snapper(x, y):
+    snapposx, snapposy = 0, 0
+    for i in range(1, 9):
+        if 200 + (i - 1) * 75 < x < 200 + i * 75:
+            snapposx = i
+            break
+    for i in range(1, 9):
+        if 75 + (i - 1) * 75 < y < 75 + i * 75:
+            snapposy = i
+            break
+    return snapposx, snapposy
+
+class Game:
+    def __init__(self,wp,bp, move, wking, bking, checking_pieces=[]):
+        self.wp = wp
+        self.bp = bp
+        self.ap = wp + bp
+        self.move = move
+        self.wking = wking
+        self.bking = bking
+        self.checking_pieces = checking_pieces
 
 class Piece:
     def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num=0):
@@ -125,20 +127,124 @@ bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
 bp.append(Piece(f"br1", 1, 1, "w", brook_image))
 bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
-ap = wp + bp
+G = Game(wp, bp, True, wking, bking)
+
+clock.tick(120)
+screen.fill(white)
+# print(check_checker(wp, bp, wking, bking))
+
+
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('localhost', 8000))
+
+
+
+while True:
+    clock.tick(120)
+    screen.fill(white)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+    screen.blit(board_image, (200, 75))
+    for i in G.ap:
+        screen.blit(i.image, (i.placerx, i.placery))
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            x, y = pygame.mouse.get_pos()
+            for j in range(1, 9):
+                if 200 + (j - 1) * 75 < x < 200 + j * 75:
+                    newposx = j
+                    break
+            for j in range(1, 9):
+                if 75 + (j - 1) * 75 < y < 75 + j * 75:
+                    newposy = j
+                    break
+            for i in G.ap:
+                if i.xpos == newposx and i.ypos == newposy:
+                    i.placerx = x
+                    i.placery = y
+                    item = i
+        if pygame.mouse.get_pressed()[0] and item:
+            x, y = pygame.mouse.get_pos()
+            item.placerx = x - 75 / 2
+            item.placery = y - 75 / 2
+        if not pygame.mouse.get_pressed()[0]:
+
+            try:
+                x, y = pygame.mouse.get_pos()
+                xsquare, ysquare = snapper(x,
+                                           y)  # xsquare and ysquare are the squares the piece is trying to be placed on
+                item.placerx = 125 + xsquare * 75
+                item.placery = ysquare * 75
+                movevalid = True
+                tempx = item.xpos
+                tempy = item.ypos
+                item.xpos = xsquare
+                item.ypos = ysquare
+                for i in G.ap:
+                    if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+                        G.ap.remove(i)
+                        takenpiece = i
+                        if i.name[0] == "w":
+                            G.wp.remove(i)
+                        else:
+                            G.bp.remove(i)
+                        tempitem = i
+
+                print("sending")
+                data = pickle.dumps([item.name, xsquare, ysquare])
+                client_socket.sendall(data)
+                result = pickle.loads(client_socket.recv(1024))
+                print(result)
+                if result:
+                    tempitem = None
+                if not result:
+                    item.placerx = 125 + tempx * 75
+                    item.xpos = tempx
+                    item.placery = tempy * 75
+                    item.ypos = tempy
+                    if tempitem:
+                        G.ap.append(tempitem)
+                        if tempitem.name[0] == "w":
+                            G.wp.append(tempitem)
+                        else:
+                            G.bp.append(tempitem)
+                if result:
+                    G.move = not G.move
+                    for i in G.ap:
+                        if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+                            G.ap.remove(i)
+                            if i.name[0] == "w":
+                                G.wp.remove(i)
+                            else:
+                                G.bp.remove(i)
+
+            except AttributeError:
+                pass
+            except NameError:
+                pass
+            item = None
+            if (len(G.ap)) != 32:
+                print(len(G.ap))
+
+
+
+    pygame.display.update()
+
+
 
 #data = pickle.loads(data)
 #print(data)
             
-for count,piece in enumerate(ap):
-    piece.update(recieved[count][0],recieved[count][1])
+#for count,piece in enumerate(ap):
+    #piece.update(recieved[count][0],recieved[count][1])
 
-while True:
-    screen.fill(white)
-    screen.blit(board_image, (200, 75))
-    for i in ap:
-        screen.blit(i.image, (i.placerx, i.placery))
-    pygame.display.update()
+#while True:
+   # screen.fill(white)
+   # screen.blit(board_image, (200, 75))
+   # for i in ap:
+  #      screen.blit(i.image, (i.placerx, i.placery))
+  #  pygame.display.update()
         
                 
 
