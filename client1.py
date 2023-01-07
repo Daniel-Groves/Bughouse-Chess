@@ -222,13 +222,6 @@ while True:
                             G.bp.append(tempitem)
                 if result:
                     G.move = not G.move
-                    for i in G.ap:
-                        if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
-                            G.ap.remove(i)
-                            if i.name[0] == "w":
-                                G.wp.remove(i)
-                            else:
-                                G.bp.remove(i)
             except AttributeError:
                 pass
             except NameError:

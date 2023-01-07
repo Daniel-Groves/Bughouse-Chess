@@ -5,7 +5,7 @@ import pickle
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 800))
-pygame.display.set_caption('CLIENT 2')
+pygame.display.set_caption('CLIENT 4')
 clock = pygame.time.Clock()
 
 image_constant = (75, 75)

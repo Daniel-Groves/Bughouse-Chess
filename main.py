@@ -728,11 +728,11 @@ while __name__ == "__main__":
         screen.blit(i.image, (i.placerx, i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = pygame.mouse.get_pos()
-            for j in range(1, 9):
+            for j in range(0, 9):
                 if 200 + (j - 1) * 75 < x < 200 + j * 75:
                     newposx = j
                     break
-            for j in range(1, 9):
+            for j in range(0, 9):
                 if 75 + (j - 1) * 75 < y < 75 + j * 75:
                     newposy = j
                     break

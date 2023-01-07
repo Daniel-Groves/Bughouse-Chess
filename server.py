@@ -1,45 +1,18 @@
 import socket
 import pickle
 import pygame
+import numpy
+import copy
 
 pygame.init()
 screen = pygame.display.set_mode((1,1),pygame.NOFRAME)
 clock = pygame.time.Clock()
 
-image_constant = (75, 75)
+
 white = (255, 255, 255)
 king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)]
 move = True  # move being true means white to move
-board_image = pygame.image.load(
-    r"Images\board.png")
-wking_image = pygame.image.load(
-    r"Images\wking.png").convert_alpha()
-wqueen_image = pygame.image.load(r"Images\wqueen.png")
-wbishop_image = pygame.image.load(r"Images\wbishop.png")
-wknight_image = pygame.image.load(r"Images\wknight.png")
-wrook_image = pygame.image.load(r"Images\wrook.png")
-wpawn_image = pygame.image.load(r"Images\wpawn.png")
 
-bking_image = pygame.image.load(r"Images\bking.png")
-bqueen_image = pygame.image.load(r"Images\bqueen.png")
-bbishop_image = pygame.image.load(r"Images\bbishop.png")
-bknight_image = pygame.image.load(r"Images\bknight.png")
-brook_image = pygame.image.load(r"Images\brook.png")
-bpawn_image = pygame.image.load(r"Images\bpawn.png")
-
-wking_image = pygame.transform.scale(wking_image, image_constant)
-wqueen_image = pygame.transform.scale(wqueen_image, image_constant)
-wbishop_image = pygame.transform.scale(wbishop_image, image_constant)
-wknight_image = pygame.transform.scale(wknight_image, image_constant)
-wrook_image = pygame.transform.scale(wrook_image, image_constant)
-wpawn_image = pygame.transform.scale(wpawn_image, image_constant)
-
-bking_image = pygame.transform.scale(bking_image, image_constant)
-bqueen_image = pygame.transform.scale(bqueen_image, image_constant)
-bbishop_image = pygame.transform.scale(bbishop_image, image_constant)
-bknight_image = pygame.transform.scale(bknight_image, image_constant)
-brook_image = pygame.transform.scale(brook_image, image_constant)
-bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
 
 def move_valid(G,item, xsquare, ysquare,newposx,
                newposy):  # function to see which piece it is and run respective function (could clean this up and put functions in class)
@@ -600,11 +573,11 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
     else:
         return False
 
-def process_request(request):
+def process_request(request, gamenum):
 
 
 
-    for i in G.ap:
+    for i in gamenum.ap:
         if i.name == request[0]:
             item = i
             xsquare = request[1]
@@ -616,7 +589,7 @@ def process_request(request):
 
 
     global takenpiece
-    global turn 
+    global turn
     takenpiece = None
     tempitem = None
 
@@ -625,26 +598,26 @@ def process_request(request):
     tempy = item.ypos
     item.xpos = xsquare
     item.ypos = ysquare
-    for i in G.ap:
+    for i in gamenum.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
-            G.ap.remove(i)
+            gamenum.ap.remove(i)
             takenpiece = i
             if i.name[0] == "w":
-                G.wp.remove(i)
+                gamenum.wp.remove(i)
             else:
-                G.bp.remove(i)
+                gamenum.bp.remove(i)
             tempitem = i
             
-    if item.name[0] == "w" and G.move:
+    if item.name[0] == "w" and gamenum.move:
         turn = True
-    elif item.name[0] == "b" and not G.move:
+    elif item.name[0] == "b" and not gamenum.move:
         turn = True
     else:
         turn = False
 
 
 
-    movevalid = move_valid(G,item, xsquare, ysquare, newposx, newposy)
+    movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy)
 
     if movevalid and turn:
         tempitem = None
@@ -654,14 +627,14 @@ def process_request(request):
         item.placery = tempy * 75
         item.ypos = tempy
         if tempitem:
-            G.ap.append(tempitem)
+            gamenum.ap.append(tempitem)
             if tempitem.name[0] == "w":
-                G.wp.append(tempitem)
+                gamenum.wp.append(tempitem)
             else:
-                G.bp.append(tempitem)
+                gamenum.bp.append(tempitem)
         return False
     if movevalid and turn:
-        G.move = not G.move
+        gamenum.move = not gamenum.move
         return True
 
 
@@ -677,12 +650,11 @@ class Game:
         self.checking_pieces = checking_pieces
 
 class Piece:
-    def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num=0):
+    def __init__(self, name, xpos, ypos, colour,move_num=0):
         self.xpos = xpos
         self.ypos = ypos
         self.colour = colour
         self.name = name
-        self.image = image
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
         self.move_num = move_num
@@ -705,38 +677,40 @@ class Piece:
 
 wp = []
 for i in range(1, 9):
-    wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
-wking = Piece(f"wk", 5, 8, "w", wking_image)
+    wp.append(Piece(f"wp{i}", i, 7, "w"))
+wking = Piece(f"wk", 5, 8, "w")
 wp.append(wking)
-wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
-wp.append(Piece(f"wb1", 3, 8, "w", wbishop_image))
-wp.append(Piece(f"wb2", 6, 8, "w", wbishop_image))
-wp.append(Piece(f"wn1", 2, 8, "w", wknight_image))
-wp.append(Piece(f"wn2", 7, 8, "w", wknight_image))
-wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
-wp.append(Piece(f"wr2", 8, 8, "w", wrook_image))
+wp.append(Piece(f"wq", 4, 8, "w"))
+wp.append(Piece(f"wb1", 3, 8, "w"))
+wp.append(Piece(f"wb2", 6, 8, "w"))
+wp.append(Piece(f"wn1", 2, 8, "w"))
+wp.append(Piece(f"wn2", 7, 8, "w"))
+wp.append(Piece(f"wr1", 1, 8, "w"))
+wp.append(Piece(f"wr2", 8, 8, "w"))
 
 board = [[" " for i in range(8)] for i in range(8)]
 print("".join([f"\n{i}" for i in board]))
 
 bp = []
 for i in range(1, 9):
-    bp.append(Piece(f"bp{i}", i, 2, "b", bpawn_image))
-bking = (Piece(f"bk", 5, 1, "w", bking_image))
+    bp.append(Piece(f"bp{i}", i, 2, "b"))
+bking = (Piece(f"bk", 5, 1, "w"))
 bp.append(bking)
-bp.append(Piece(f"bq", 4, 1, "w", bqueen_image))
-bp.append(Piece(f"bb1", 3, 1, "w", bbishop_image))
-bp.append(Piece(f"bb2", 6, 1, "w", bbishop_image))
-bp.append(Piece(f"bn1", 2, 1, "w", bknight_image))
-bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
-bp.append(Piece(f"br1", 1, 1, "w", brook_image))
-bp.append(Piece(f"br2", 8, 1, "w", brook_image))
+bp.append(Piece(f"bq", 4, 1, "w"))
+bp.append(Piece(f"bb1", 3, 1, "w"))
+bp.append(Piece(f"bb2", 6, 1, "w"))
+bp.append(Piece(f"bn1", 2, 1, "w"))
+bp.append(Piece(f"bn2", 7, 1, "w"))
+bp.append(Piece(f"br1", 1, 1, "w"))
+bp.append(Piece(f"br2", 8, 1, "w"))
 
-G = Game(wp, bp, True, wking, bking)
+G1 = Game(wp, bp, True, wking, bking)
+G2 = copy.deepcopy(G1)
+
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #socket object
 server_socket.bind(('localhost', 8000)) #binds socket to local port
-server_socket.listen(2) #listening for connections
+server_socket.listen(4) #listening for connections
 
 print('Listening for connections...')
 
@@ -744,6 +718,10 @@ client1, address1 = server_socket.accept() #accepts a connection from each clien
 print(f'Connected to {address1}')
 client2, address2 = server_socket.accept()
 print(f'Connected to {address2}')
+client3, address3 = server_socket.accept()
+print(f'Connected to {address3}')
+client4, address4 = server_socket.accept()
+print(f'Connected to {address4}')
 
 
 
@@ -760,7 +738,7 @@ while True:
             break
         request = pickle.loads(data)
         print(request)
-        result = process_request(request)
+        result = process_request(request,G1)
         client.sendall(pickle.dumps(result))
         if result: #if a move is valid it send to the other client so their board can update
             if client == client1:
@@ -774,6 +752,34 @@ while True:
                 while True:
                     try:
                         client1.sendall(data)
+                        break
+                    except OSError:
+                        pass
+    for client in (client3, client4): #alternates between requests from client1 and client2 as it can't deal with both simultaneously
+        print("listening")
+        client.settimeout(0.00001)
+        try:
+            data = client.recv(1024)
+        except socket.timeout:
+            continue
+        if not data:
+            break
+        request = pickle.loads(data)
+        print(request)
+        result = process_request(request,G2)
+        client.sendall(pickle.dumps(result))
+        if result: #if a move is valid it send to the other client so their board can update
+            if client == client3:
+                while True:
+                    try:
+                        client4.sendall(data) #keep trying to send until recieved
+                        break
+                    except OSError:
+                        pass
+            else:
+                while True:
+                    try:
+                        client3.sendall(data)
                         break
                     except OSError:
                         pass

@@ -5,7 +5,7 @@ import pickle
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 800))
-pygame.display.set_caption('CLIENT 2')
+pygame.display.set_caption('CLIENT 3')
 clock = pygame.time.Clock()
 
 image_constant = (75, 75)
@@ -186,7 +186,7 @@ while True:
                             G.bp.remove(i)
                         tempitem = i
 
-                if G.move == False:
+                if G.move == True:
                     print("sending")
                     data = pickle.dumps([item.name, xsquare, ysquare])
                     while True:
@@ -200,6 +200,7 @@ while True:
                     print(result)
                 else:
                     result = False
+
                 if result:
                     tempitem = None
                 if not result:
@@ -235,15 +236,12 @@ while True:
                         else:
                             G.bp.remove(i)
                     if i.name == result[0]:
-                        i.xpos, i.ypos = result[1],result[2]
+                        i.xpos, i.ypos = result[1], result[2]
                         i.placerx = 125 + result[1] * 75
                         i.placery = result[2] * 75
             except socket.timeout:
                 # No result was received within the timeout
                 continue
-
-
-
 
     pygame.display.update()
 
