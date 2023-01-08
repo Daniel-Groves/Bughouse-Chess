@@ -65,10 +65,17 @@ def board_text(piecelist):  # function to print out a text version of the board
 
 def move_valid(G,item, xsquare, ysquare,newposx,
                newposy):  # function to see which piece it is and run respective function (could clean this up and put functions in class)
+    if newposx <= 0 or newposx >= 9:
+        if item[:1] == "wp" and ysquare == 8 or item[:1] == "bp" and ysquare == 1:
+            return False
+        else:
+            return True
+
+    if ysquare <= 0 or xsquare <=0 or ysquare >= 9 or xsquare >=9:
+        return False
     if item.name[1] == "k":
         movevalid = king_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "q":
-        print("cool")
         movevalid = queen_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "b":
         movevalid = bishop_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
@@ -91,13 +98,10 @@ def move_valid(G,item, xsquare, ysquare,newposx,
     else:
         movevalid = True
 
-    print(item.name, item.xpos, item.ypos)
-    print(f"check_checker, {item.name, item.xpos, item.ypos}")
     return movevalid and not check_checker(G)
 
 
 def checkmate_checker(G):  # function to check if it is checkmate
-    print([i.name for i in G.checking_pieces])
     checkmate = True
     global king
     if G.move:  # see whose move it is in order to determine for who we are detecting checkmate
@@ -377,7 +381,6 @@ def check_checker(G, simulated_move=False):
         pieces = G.wp
         king = G.bking
 
-    print(f"ehite_pieces {white_pieces}")
 
     for piece in pieces:
         if piece.name[1] == "k":
@@ -385,7 +388,6 @@ def check_checker(G, simulated_move=False):
         elif piece.name[1] == "q":
             checktake = queen_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                print("uh oh")
                 G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "b":
@@ -462,14 +464,11 @@ def king_moves(G,x, y, startx, starty, item):
 
 
 def queen_moves(G,x, y, startx, starty, queen):
-    print(f" qmove {x,y,startx,starty}")
     returner = True
     if x == 0 and y == 0:
         returner = False
     elif abs(x) == abs(y):
-        print("okayy")
         for i in range(0, abs(x) + 1):
-            print(i)
             if x < 0:
                 vectorx = startx - i
             elif x > 0:
@@ -482,7 +481,6 @@ def queen_moves(G,x, y, startx, starty, queen):
                 return True
             elif piecethere(G,vectorx, vectory, queen):
                 returner = False
-                print("humm")
                 return returner
             else:
                 returner = True
@@ -514,7 +512,6 @@ def queen_moves(G,x, y, startx, starty, queen):
                 returner = True
     else:
         returner = False
-    print(f"returner {returner}")
     return returner
 
 
@@ -569,10 +566,9 @@ def rook_moves(G,x, y, startx, starty, rook):
         elif x == 0:
             for i in range(1, abs(y) + 1):
                 if y > 0:
-                    vectory = starty - i
-                if y < 1:
                     vectory = starty + i
-                print(f"vector y {vectory}")
+                if y < 1:
+                    vectory = starty - i
                 if abs(y) == i and piecethereexclude(G,startx, vectory, rook):
                     return True
                 elif piecethere(G,startx, vectory, rook):
@@ -590,7 +586,7 @@ def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece):
         return True
     elif abs(x) == 1 and y == -1 and takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa):
         return True
-    elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 1, wpa) and first == 0:
+    elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 2, wpa) and first == 0:
         return True
     else:
         return False
@@ -600,7 +596,7 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
         return True
     elif abs(x) == 1 and y == 1 and takenpiecechecker(G,takenpiece, startx + x, starty + 1, bpa):
         return True
-    elif x == 0 and y == 2 and not piecethere(G,startx + x, starty + 1, bpa) and first == 0:
+    elif x == 0 and y == 2 and not piecethere(G,startx + x, starty + 2, bpa) and first == 0:
         return True
     else:
         return False
@@ -728,11 +724,11 @@ while __name__ == "__main__":
         screen.blit(i.image, (i.placerx, i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = pygame.mouse.get_pos()
-            for j in range(0, 9):
+            for j in range(1, 9):
                 if 200 + (j - 1) * 75 < x < 200 + j * 75:
                     newposx = j
                     break
-            for j in range(0, 9):
+            for j in range(1, 9):
                 if 75 + (j - 1) * 75 < y < 75 + j * 75:
                     newposy = j
                     break
@@ -781,9 +777,7 @@ while __name__ == "__main__":
                 else:
                     turn = False
 
-                print("calling")
                 movevalid = move_valid(G,item, xsquare, ysquare, newposx, newposy)
-                print(movevalid)
 
 
                 if movevalid and turn:

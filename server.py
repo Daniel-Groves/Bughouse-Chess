@@ -16,6 +16,14 @@ move = True  # move being true means white to move
 
 def move_valid(G,item, xsquare, ysquare,newposx,
                newposy):  # function to see which piece it is and run respective function (could clean this up and put functions in class)
+    if newposx <= 0 or newposx >= 9:
+        if item[:1] == "wp" and ysquare == 8 or item[:1] == "bp" and ysquare == 1:
+            return False
+        else:
+            return True
+
+    if ysquare <= 0 or xsquare <=0 or ysquare >= 9 or xsquare >=9:
+        return False
     if item.name[1] == "k":
         movevalid = king_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[1] == "q":
@@ -538,9 +546,9 @@ def rook_moves(G,x, y, startx, starty, rook):
         elif x == 0:
             for i in range(1, abs(y) + 1):
                 if y > 0:
-                    vectory = starty - i
-                if y < 1:
                     vectory = starty + i
+                if y < 1:
+                    vectory = starty - i
                 if abs(y) == i and piecethereexclude(G,startx, vectory, rook):
                     return True
                 elif piecethere(G,startx, vectory, rook):
@@ -558,7 +566,7 @@ def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece):
         return True
     elif abs(x) == 1 and y == -1 and takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa):
         return True
-    elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 1, wpa) and first == 0:
+    elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 2, wpa) and first == 0:
         return True
     else:
         return False
@@ -568,7 +576,7 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
         return True
     elif abs(x) == 1 and y == 1 and takenpiecechecker(G,takenpiece, startx + x, starty + 1, bpa):
         return True
-    elif x == 0 and y == 2 and not piecethere(G,startx + x, starty + 1, bpa) and first == 0:
+    elif x == 0 and y == 2 and not piecethere(G,startx + x, starty + 2, bpa) and first == 0:
         return True
     else:
         return False
