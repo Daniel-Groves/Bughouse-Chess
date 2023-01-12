@@ -253,7 +253,6 @@ board = [[" " for i in range(8)] for i in range(8)]
      True,
      False
     )
-
     ])
 
 
