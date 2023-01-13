@@ -145,7 +145,7 @@ while True:
             run = False
     screen.blit(board_image, (200, 75))
     for i in G.ap:
-        screen.blit(i.image, (i.placerx, i.placery))
+        screen.blit(i.image, (9*75 - i.placerx + 250, 9*75 - i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = pygame.mouse.get_pos()
             for j in range(1, 9):
@@ -157,14 +157,14 @@ while True:
                     newposy = j
                     break
             for i in G.ap:
-                if i.xpos == newposx and i.ypos == newposy:
+                if i.xpos == 9-newposx and i.ypos == 9-newposy:
                     i.placerx = x
                     i.placery = y
                     item = i
         if pygame.mouse.get_pressed()[0] and item:
             x, y = pygame.mouse.get_pos()
-            item.placerx = x - 75 / 2
-            item.placery = y - 75 / 2
+            item.placerx = (x - 75 / 2)
+            item.placery = (y - 75 / 2)
         if not pygame.mouse.get_pressed()[0]:
 
             try:
@@ -176,10 +176,10 @@ while True:
                 movevalid = True
                 tempx = item.xpos
                 tempy = item.ypos
-                item.xpos = xsquare
-                item.ypos = ysquare
+                item.xpos = 9 - xsquare
+                item.ypos = 9 - ysquare
                 for i in G.ap:
-                    if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+                    if i.xpos == xsquare and i.ypos == 9 - ysquare and i.name[0] != item.name[0]:
                         G.ap.remove(i)
                         takenpiece = i
                         if i.name[0] == "w":
@@ -190,7 +190,8 @@ while True:
 
                 if G.move == False:
                     print("sending")
-                    data = pickle.dumps([item.name, xsquare, ysquare])
+                    print(9 - xsquare,9 - ysquare)
+                    data = pickle.dumps([item.name, 9 - xsquare, 9 - ysquare])
                     while True:
                         try:
                             client_socket.sendall(data)
