@@ -53,7 +53,6 @@ def move_valid(G,item, xsquare, ysquare,newposx,
 
 
 def checkmate_checker(G):  # function to check if it is checkmate
-    print([i.name for i in G.checking_pieces])
     checkmate = True
     global king
     if G.move:  # see whose move it is in order to determine for who we are detecting checkmate
@@ -722,21 +721,18 @@ server_socket.listen(4) #listening for connections
 
 print('Listening for connections...')
 
-client1, address1 = server_socket.accept() #accepts a connection from each client
-print(f'Connected to {address1}')
-client2, address2 = server_socket.accept()
-print(f'Connected to {address2}')
-client3, address3 = server_socket.accept()
-print(f'Connected to {address3}')
-client4, address4 = server_socket.accept()
-print(f'Connected to {address4}')
+
+for client in range(4): #accept four clients
+    client_socket, client_address = server_socket.accept()
+    client_name = client_socket.recv(1024).decode()
+    exec(client_name + " =  client_socket")
+    print(f"Connected to {client_name}") #associate with the name sent
+
 
 
 
 while True:
-    print("loop")
     for client in (client1, client2): #alternates between requests from client1 and client2 as it can't deal with both simultaneously
-        print("listening")
         client.settimeout(0.00001)
         try:
             data = client.recv(1024)
@@ -764,7 +760,6 @@ while True:
                     except OSError:
                         pass
     for client in (client3, client4): #alternates between requests from client1 and client2 as it can't deal with both simultaneously
-        print("listening")
         client.settimeout(0.00001)
         try:
             data = client.recv(1024)
@@ -773,7 +768,6 @@ while True:
         if not data:
             break
         request = pickle.loads(data)
-        print(request)
         result = process_request(request,G2)
         client.sendall(pickle.dumps(result))
         if result: #if a move is valid it send to the other client so their board can update

@@ -135,6 +135,8 @@ screen.fill(white)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(('localhost', 8000))
 
+client_socket.send("client4".encode())
+
 while True:
     clock.tick(120)
     screen.fill(white)
@@ -187,7 +189,6 @@ while True:
                         tempitem = i
 
                 if G.move == False:
-                    print("sending")
                     data = pickle.dumps([item.name, xsquare, ysquare])
                     while True:
                         try:
@@ -197,7 +198,6 @@ while True:
                             pass
                     client_socket.settimeout(100000)
                     result = pickle.loads(client_socket.recv(1024))
-                    print(result)
                 else:
                     result = False
                 if result:
@@ -224,10 +224,8 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                print(result)
                 G.move = not G.move
                 for i in G.ap:
-                    print(i.name, i.xpos, i.ypos)
                     if i.xpos == result[1] and i.ypos == result[2]:
                         G.ap.remove(i)
                         if i.name[0] == "w":
