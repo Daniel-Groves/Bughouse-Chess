@@ -314,7 +314,7 @@ board = [[" " for i in range(8)] for i in range(8)]
      False,
      True
      ),
-(Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 2
+(Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 13
         Piece(f"bk", 5, 1, "b", bking_image),
         [Piece(f"wk", 7, 8, "w", wking_image),
          Piece(f"wp1", 1, 7, "w", wpawn_image),

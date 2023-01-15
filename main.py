@@ -255,7 +255,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                                 G.bp.append(tempitem)
                             tempitem = None
             if checker.ypos - king.ypos == 0:
-                print("yep")
                 for i in range(0, abs(king.xpos - checker.xpos)):
                     for piece in pieces:
                         tempx = piece.xpos
