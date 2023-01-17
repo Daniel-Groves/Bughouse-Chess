@@ -110,6 +110,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
     checkmate = True
     global king
     global tempitem
+    tempitem = None
     if G.move:  # see whose move it is in order to determine for who we are detecting checkmate
         pieces = [piece for piece in G.wp if piece.name[1] != "k"]
         king = G.wking
@@ -122,16 +123,49 @@ def checkmate_checker(G):  # function to check if it is checkmate
     tempx, tempy = king.xpos, king.ypos
 
     for vector in king_vectors:  # checks if there is anywhere the king can legally move to
-        king.xpos, king.ypos = king.xpos + vector[0], king.ypos + vector[1]
         blockage = False
         for piece in pieces:
-            if (piece.xpos, piece.ypos) == (king.xpos, king.ypos):
+            if (piece.xpos, piece.ypos) == (king.xpos + vector[0], king.ypos + vector[1]):
                 blockage = True  # blockage sees if there is a piece of the same colour at the new square
-        if move_valid(G,king, king.xpos, king.ypos, tempx, tempy) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
+
+        king.xpos, king.ypos = king.xpos + vector[0], king.ypos + vector[1]
+
+        for i in G.ap:
+            if i.xpos == king.xpos and i.ypos == king.ypos and i.name[0] != "k":
+                G.ap.remove(i)
+                takenpiece = i
+                if i.name[0] == "w":
+                    G.wp.remove(i)
+                else:
+                    G.bp.remove(i)
+                tempitem = i
+
+
+        if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
+            if tempitem:
+                G.ap.append(tempitem)
+                if tempitem.name[0] == "w":
+                    G.wp.append(tempitem)
+                else:
+                    G.bp.append(tempitem)
+
             checkmate = False
+            king.xpos = tempx
+            king.ypos = tempy
             continue
+        else:
+            if tempitem:
+                G.ap.append(tempitem)
+                if tempitem.name[0] == "w":
+                    G.wp.append(tempitem)
+                else:
+                    G.bp.append(tempitem)
+        tempitem = None
         king.xpos = tempx
         king.ypos = tempy
+
+    print(checkmate)
+
     for checker in G.checking_pieces:
         if checker.name[1] == "b":
             for i in range(0, abs(king.xpos - checker.xpos) + 1):
@@ -259,7 +293,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
-                        print(king.xpos,king.ypos, checker.xpos, checker.ypos)
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
                         piece.ypos = checker.ypos
                         if i == 0:
@@ -272,7 +305,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             tempitem = checker
                         if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                                       tempy, True) and not check_checker(G, True):
-                            print(f"WWW {piece.name,piece.xpos, piece.ypos,tempx,tempy}")
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -389,7 +421,6 @@ def check_checker(G, simulated_move=False):
         pieces = G.wp
         king = G.bking
 
-    print(f"should be True: {white_pieces}")
 
 
 
@@ -399,25 +430,21 @@ def check_checker(G, simulated_move=False):
         elif piece.name[1] == "q":
             checktake = queen_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                print("queen checktake")
                 G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "b":
             checktake = bishop_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                print("bishop checktake")
                 G.checking_pieces.append(piece)
                 return checktake
         if piece.name[1] == "n":
             checktake = knight_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                print("knight checktake")
                 G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[1] == "r":
             checktake = rook_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos, piece)
             if checktake:
-                print("rook checktake",piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos)
                 G.checking_pieces.append(piece)
                 return checktake
         if piece.name[0:2] == "wp":
@@ -433,7 +460,6 @@ def check_checker(G, simulated_move=False):
                 G.checking_pieces.append(piece)
                 return checktake
     else:
-        print("check returning False")
         return False
 
 
@@ -559,14 +585,12 @@ def bishop_moves(G,x, y, startx, starty, bishop):
 def knight_moves(G,x, y, startx, starty, knight):
     if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
         if piecethereexclude(G,startx + x, starty + y, knight) or not piecethere(G,startx + x, starty + y, knight):
-            print("returning true")
             return True
     else:
         return False
 
 
 def rook_moves(G,x, y, startx, starty, rook):
-    print(x, y, startx, starty, rook.name)
     returner = False
     if x == 0 or y == 0:
         if y == 0:
@@ -587,7 +611,6 @@ def rook_moves(G,x, y, startx, starty, rook):
                     vectory = starty - i
                 if y < 1:
                     vectory = starty + i
-                    print(f"vector {vectory}")
                 if abs(y) == i and piecethereexclude(G,startx, vectory, rook):
                     return True
                 elif piecethere(G,startx, vectory, rook):

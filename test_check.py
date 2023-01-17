@@ -224,7 +224,7 @@ board = [[" " for i in range(8)] for i in range(8)]
         Piece(f"wr1", 4, 7, "w", wrook_image),
         Piece(f"wb1", 2, 6, "w", wbishop_image)
      ],
-     [  Piece(f"bk", 5, 1, "b", bking_image),
+     [  Piece(f"bk", 1, 4, "b", bking_image),
         Piece(f"bp1", 1, 2, "b", bpawn_image),
         Piece(f"bp2", 2, 2, "b", bpawn_image),
         Piece(f"bp3", 3, 2, "b", bpawn_image),
@@ -314,33 +314,39 @@ board = [[" " for i in range(8)] for i in range(8)]
      False,
      True
      ),
-(Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 13
+    (Piece(f"wk", 5, 8, "w", wking_image), #TEST CASE 13
         Piece(f"bk", 5, 1, "b", bking_image),
-        [Piece(f"wk", 7, 8, "w", wking_image),
+        [Piece(f"wk", 5, 8, "w", wking_image),
          Piece(f"wp1", 1, 7, "w", wpawn_image),
         Piece(f"wp2", 2, 7, "w", wpawn_image),
-        Piece(f"wp3", 3, 7, "w", wpawn_image),
-        Piece(f"wp4", 4, 6, "w", wpawn_image),
-        Piece(f"wp5", 6, 7, "w", wpawn_image),
-        Piece(f"wp6", 7, 6, "w", wpawn_image),
-        Piece(f"wp7", 8, 7, "w", wpawn_image),
-        Piece(f"wq", 6, 8, "w", wqueen_image),
+        Piece(f"wp3", 3, 5, "w", wpawn_image),
+        Piece(f"wp4", 6, 7, "w", wpawn_image),
+        Piece(f"wp5", 7, 7, "w", wpawn_image),
+        Piece(f"wp6", 8, 7, "w", wpawn_image),
+        Piece(f"wq", 4, 1, "w", wqueen_image),
+        Piece(f"wn1", 2, 8, "w", wknight_image),
+        Piece(f"wb1", 3, 8, "w", wbishop_image),
+        Piece(f"wn2", 6, 6, "w", wknight_image),
         Piece(f"wr1", 1, 8, "w", wrook_image),
-        Piece(f"wn1", 3, 4, "w", wpawn_image),
+        Piece(f"wn1", 8, 8, "w", wpawn_image),
      ],
      [  Piece(f"bk", 5, 1, "b", bking_image),
         Piece(f"bp1", 1, 2, "b", bpawn_image),
-        Piece(f"bp2", 3, 3, "b", bpawn_image),
-        Piece(f"bp3", 6, 2, "b", bpawn_image),
-        Piece(f"bp4", 7, 2, "b", bpawn_image),
-        Piece(f"bp5", 8, 2, "b", bpawn_image),
-        Piece(f"bq", 7, 4, "b", bqueen_image),
+        Piece(f"bp2", 1, 3, "b", bpawn_image),
+        Piece(f"bp3", 5, 4, "b", bpawn_image),
+        Piece(f"bp4", 6, 2, "b", bpawn_image),
+        Piece(f"bp5", 7, 2, "b", bpawn_image),
+        Piece(f"bp6", 8, 2, "b", bpawn_image),
         Piece(f"br1", 1, 1, "b", brook_image),
         Piece(f"br2", 8, 1, "b", brook_image),
-        Piece(f"bn1", 7, 1, "b", bpawn_image)],
+        Piece(f"bn1", 6, 3, "b", bpawn_image),
+        Piece(f"bb1", 3, 1, "b", bbishop_image),
+        Piece(f"bb2", 6, 1, "b", bbishop_image)],
      False,
-     True
-     ),
+     False
+     )
+
+
 
     ])
 
