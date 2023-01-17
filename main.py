@@ -140,6 +140,9 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.bp.remove(i)
                 tempitem = i
 
+        if vector == (1,-1):
+            print(check_checker(G, True))
+            print(king.xpos,king.ypos)
 
         if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
             if tempitem:
@@ -148,7 +151,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.wp.append(tempitem)
                 else:
                     G.bp.append(tempitem)
-
+            print(vector)
             checkmate = False
             king.xpos = tempx
             king.ypos = tempy
@@ -415,12 +418,11 @@ def check_checker(G, simulated_move=False):
         white_pieces = G.move
 
     if white_pieces:
-        pieces = G.bp
-        king = G.wking
-    else:
         pieces = G.wp
         king = G.bking
-
+    else:
+        pieces = G.bp
+        king = G.wking
 
 
 
