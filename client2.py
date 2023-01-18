@@ -163,21 +163,21 @@ while True:
                     item = i
         if pygame.mouse.get_pressed()[0] and item:
             x, y = pygame.mouse.get_pos()
-            item.placerx = (x - 75 / 2)
-            item.placery = (y - 75 / 2)
+            item.placerx = 9*75 - (x - 75 / 2) + 250
+            item.placery = 9*75 - (y - 75 / 2)
         if not pygame.mouse.get_pressed()[0]:
 
             try:
                 x, y = pygame.mouse.get_pos()
                 xsquare, ysquare = snapper(x,
                                            y)  # xsquare and ysquare are the squares the piece is trying to be placed on
-                item.placerx = 125 + xsquare * 75
-                item.placery = ysquare * 75
+                item.placerx = 125 + (9-xsquare) * 75
+                item.placery = (9-ysquare) * 75
                 movevalid = True
                 tempx = item.xpos
                 tempy = item.ypos
-                item.xpos = 9 - xsquare
-                item.ypos = 9 - ysquare
+                item.xpos = xsquare
+                item.ypos = ysquare
                 for i in G.ap:
                     if i.xpos == xsquare and i.ypos == 9 - ysquare and i.name[0] != item.name[0]:
                         G.ap.remove(i)
@@ -188,8 +188,10 @@ while True:
                             G.bp.remove(i)
                         tempitem = i
 
+
                 if G.move == False:
                     print("sending")
+                    print(xsquare, ysquare)
                     print(9 - xsquare,9 - ysquare)
                     data = pickle.dumps([item.name, 9 - xsquare, 9 - ysquare])
                     while True:
@@ -200,7 +202,6 @@ while True:
                             pass
                     client_socket.settimeout(100000)
                     result = pickle.loads(client_socket.recv(1024))
-                    print(result)
                 else:
                     result = False
                 if result:
@@ -227,11 +228,12 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                print(result)
+                print(f"result {result}")
                 G.move = not G.move
                 for i in G.ap:
-                    print(i.name, i.xpos, i.ypos)
-                    if i.xpos == result[1] and i.ypos == result[2]:
+                    if i.name[:2] == "bn":
+                        print(f" knight {i.name, i.xpos,i.ypos}")
+                    if (9-i.xpos) == result[1] and (9-i.ypos) == result[2]:
                         G.ap.remove(i)
                         if i.name[0] == "w":
                             G.wp.remove(i)

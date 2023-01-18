@@ -91,9 +91,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.bp.remove(i)
                 tempitem = i
 
-        if vector == (1,-1):
-            print(check_checker(G, True))
-            print(king.xpos,king.ypos)
+
 
         if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
             if tempitem:
@@ -102,7 +100,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.wp.append(tempitem)
                 else:
                     G.bp.append(tempitem)
-            print(vector)
             checkmate = False
             king.xpos = tempx
             king.ypos = tempy
@@ -118,7 +115,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
         king.xpos = tempx
         king.ypos = tempy
 
-    print(checkmate)
 
     for checker in G.checking_pieces:
         if checker.name[1] == "b":
