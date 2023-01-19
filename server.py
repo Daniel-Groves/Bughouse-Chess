@@ -360,9 +360,9 @@ def checkmate_checker(G):  # function to check if it is checkmate
 
 def check_checker(G, simulated_move=False):
     if simulated_move:
-        white_pieces = not G.move
-    elif simulated_move == False:
         white_pieces = G.move
+    elif simulated_move == False:
+        white_pieces = not G.move
 
     if white_pieces:
         pieces = G.wp
@@ -370,6 +370,7 @@ def check_checker(G, simulated_move=False):
     else:
         pieces = G.bp
         king = G.wking
+
 
 
 
@@ -455,6 +456,7 @@ def king_moves(G,x, y, startx, starty, item):
 
 
 def queen_moves(G,x, y, startx, starty, queen):
+
     returner = True
     if x == 0 and y == 0:
         returner = False
@@ -591,10 +593,9 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
         return True
     else:
         return False
+
+
 def process_request(request, gamenum):
-
-
-
     for i in gamenum.ap:
         if i.name == request[0]:
             item = i
@@ -608,6 +609,7 @@ def process_request(request, gamenum):
 
     global takenpiece
     global turn
+    global tempitem
     takenpiece = None
     tempitem = None
 
@@ -619,12 +621,15 @@ def process_request(request, gamenum):
     for i in gamenum.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
             gamenum.ap.remove(i)
+            print(f"removing {i.name}")
             takenpiece = i
             if i.name[0] == "w":
                 gamenum.wp.remove(i)
             else:
                 gamenum.bp.remove(i)
             tempitem = i
+
+    print(f"temp {tempitem.name}")
             
     if item.name[0] == "w" and gamenum.move:
         turn = True
@@ -653,6 +658,7 @@ def process_request(request, gamenum):
         return False
     if movevalid and turn:
         gamenum.move = not gamenum.move
+        print(f"tempitem {tempitem}")
         return True
 
 
@@ -755,21 +761,31 @@ while True:
         print(request)
         result = process_request(request,G1)
         client.sendall(pickle.dumps(result))
-        if result: #if a move is valid it send to the other client so their board can update
+        if result:  # if a move is valid it send to the other client so their board can update
+            print("yes result", tempitem)
             if client == client1:
                 while True:
                     try:
-                        client2.sendall(data) #keep trying to send until recieved
+                        if tempitem:
+                            print("yay")
+                            request.append(tempitem.name)
+                            data = pickle.loads(request)
+                        client2.sendall(data)  # keep trying to send until recieved
                         break
                     except OSError:
                         pass
             else:
                 while True:
                     try:
+                        if tempitem:
+                            request.append(tempitem.name)
+                            data = pickle.loads(request)
                         client1.sendall(data)
                         break
                     except OSError:
                         pass
+
+
     for client in (client3, client4): #alternates between requests from client1 and client2 as it can't deal with both simultaneously
         client.settimeout(0.00001)
         try:
@@ -782,9 +798,14 @@ while True:
         result = process_request(request,G2)
         client.sendall(pickle.dumps(result))
         if result: #if a move is valid it send to the other client so their board can update
+
             if client == client3:
                 while True:
                     try:
+                        if tempitem:
+                            print("yay")
+                            request.append(tempitem.name)
+                            data = pickle.loads(request)
                         client4.sendall(data) #keep trying to send until recieved
                         break
                     except OSError:
@@ -792,6 +813,9 @@ while True:
             else:
                 while True:
                     try:
+                        if tempitem:
+                            request.append(tempitem.name)
+                            data = pickle.loads(request)
                         client3.sendall(data)
                         break
                     except OSError:

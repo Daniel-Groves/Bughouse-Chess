@@ -99,9 +99,21 @@ class Piece:
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
 
+    def add_image(self):
+        if self.name[1] == "p":
+            self.image = wpawn_image
+        elif self.name[1] == "q":
+            self.image = wqueen_image
+        elif self.name[1] == "r":
+            self.image = wrook_image
+        elif self.name[1] == "n":
+            self.image = wknight_image
+        elif self.name[1] == "b":
+            self.image = wbishop_image
+
 wp = []
 for i in range(1, 9):
-    wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp{i}", i, 7, "w",wpawn_image))
 wking = Piece(f"wk", 5, 8, "w", wking_image)
 wp.append(wking)
 wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
@@ -232,9 +244,20 @@ while True:
             try:
                 result = pickle.loads(client_socket.recv(1024))
                 print(result)
+                try:
+                    newpiece = result[3]
+                    if newpiece[0] == "w":
+                        newobject = Piece(newpiece, 0, 0, "w")
+                        G.wp.append(newobject)
+                    else:
+                        newobject = Piece(newpiece, 0, 0, "b")
+                        G.bp.append(newobject)
+                    G.ap.append(newobject)
+                except IndexError:
+                    pass
+
                 G.move = not G.move
                 for i in G.ap:
-                    print(i.name, i.xpos, i.ypos)
                     if i.xpos == result[1] and i.ypos == result[2]:
                         G.ap.remove(i)
                         if i.name[0] == "w":

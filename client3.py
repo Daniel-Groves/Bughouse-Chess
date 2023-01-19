@@ -1,4 +1,4 @@
-# client1.py
+# client3.py
 import pygame
 import socket
 import pickle

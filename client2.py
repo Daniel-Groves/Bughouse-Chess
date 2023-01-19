@@ -1,4 +1,4 @@
-# client1.py
+# client2.py
 import pygame
 import socket
 import pickle
@@ -191,9 +191,12 @@ while True:
 
                 if G.move == False:
                     print("sending")
-                    print(xsquare, ysquare)
                     print(9 - xsquare,9 - ysquare)
                     data = pickle.dumps([item.name, 9 - xsquare, 9 - ysquare])
+                    item.xpos = 9 - item.xpos
+                    item.ypos = 9 - item.ypos
+                    if item.name[1] == "p":
+                        print(f"pawn {item.xpos,item.ypos}")
                     while True:
                         try:
                             client_socket.sendall(data)
@@ -231,9 +234,7 @@ while True:
                 print(f"result {result}")
                 G.move = not G.move
                 for i in G.ap:
-                    if i.name[:2] == "bn":
-                        print(f" knight {i.name, i.xpos,i.ypos}")
-                    if (9-i.xpos) == result[1] and (9-i.ypos) == result[2]:
+                    if i.xpos == result[1] and i.ypos == result[2]:
                         G.ap.remove(i)
                         if i.name[0] == "w":
                             G.wp.remove(i)

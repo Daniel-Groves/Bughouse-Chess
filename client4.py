@@ -1,4 +1,4 @@
-# client1.py
+# client4.py
 import pygame
 import socket
 import pickle
@@ -145,7 +145,7 @@ while True:
             run = False
     screen.blit(board_image, (200, 75))
     for i in G.ap:
-        screen.blit(i.image, (i.placerx, i.placery))
+        screen.blit(i.image, (9*75 - i.placerx + 250, 9*75 - i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = pygame.mouse.get_pos()
             for j in range(1, 9):
@@ -157,29 +157,29 @@ while True:
                     newposy = j
                     break
             for i in G.ap:
-                if i.xpos == newposx and i.ypos == newposy:
+                if i.xpos == 9-newposx and i.ypos == 9-newposy:
                     i.placerx = x
                     i.placery = y
                     item = i
         if pygame.mouse.get_pressed()[0] and item:
             x, y = pygame.mouse.get_pos()
-            item.placerx = x - 75 / 2
-            item.placery = y - 75 / 2
+            item.placerx = 9*75 - (x - 75 / 2) + 250
+            item.placery = 9*75 - (y - 75 / 2)
         if not pygame.mouse.get_pressed()[0]:
 
             try:
                 x, y = pygame.mouse.get_pos()
                 xsquare, ysquare = snapper(x,
                                            y)  # xsquare and ysquare are the squares the piece is trying to be placed on
-                item.placerx = 125 + xsquare * 75
-                item.placery = ysquare * 75
+                item.placerx = 125 + (9-xsquare) * 75
+                item.placery = (9-ysquare) * 75
                 movevalid = True
                 tempx = item.xpos
                 tempy = item.ypos
                 item.xpos = xsquare
                 item.ypos = ysquare
                 for i in G.ap:
-                    if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+                    if i.xpos == xsquare and i.ypos == 9 - ysquare and i.name[0] != item.name[0]:
                         G.ap.remove(i)
                         takenpiece = i
                         if i.name[0] == "w":
@@ -188,8 +188,15 @@ while True:
                             G.bp.remove(i)
                         tempitem = i
 
+
                 if G.move == False:
-                    data = pickle.dumps([item.name, xsquare, ysquare])
+                    print("sending")
+                    print(9 - xsquare,9 - ysquare)
+                    data = pickle.dumps([item.name, 9 - xsquare, 9 - ysquare])
+                    item.xpos = 9 - item.xpos
+                    item.ypos = 9 - item.ypos
+                    if item.name[1] == "p":
+                        print(f"pawn {item.xpos,item.ypos}")
                     while True:
                         try:
                             client_socket.sendall(data)
@@ -224,6 +231,7 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
+                print(f"result {result}")
                 G.move = not G.move
                 for i in G.ap:
                     if i.xpos == result[1] and i.ypos == result[2]:
