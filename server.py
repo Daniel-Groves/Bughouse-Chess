@@ -19,10 +19,10 @@ def move_valid(G,item, xsquare, ysquare,newposx,
 
 
     if newposx <= 0 or newposx >= 9:
-        if item[:1] == "wp" and ysquare == 8 or item[:1] == "bp" and ysquare == 1:
+        if item.name[:1] == "wp" and ysquare == 8 or item.name[:1] == "bp" and ysquare == 1:
             return False
         else:
-            return True
+                return True
 
     if ysquare <= 0 or xsquare <=0 or ysquare >= 9 or xsquare >=9:
         return False
@@ -414,10 +414,12 @@ def check_checker(G, simulated_move=False):
 
 
 def piecethere(G, xsquare, ysquare, compare):
+    print(xsquare,ysquare,compare.name)
     for i in G.ap:
+        print(i.name,i.xpos,i.ypos)
         if i.xpos == xsquare and i.ypos == ysquare and i != compare:
             return True
-
+    print("returning False")
     return False
 
 
@@ -597,6 +599,7 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
 
 def process_request(request, gamenum):
     for i in gamenum.ap:
+        print(i.name, i.xpos,i.ypos)
         if i.name == request[0]:
             item = i
             xsquare = request[1]
@@ -612,6 +615,7 @@ def process_request(request, gamenum):
     global tempitem
     takenpiece = None
     tempitem = None
+    captured = False
 
 
     tempx = item.xpos
@@ -620,8 +624,8 @@ def process_request(request, gamenum):
     item.ypos = ysquare
     for i in gamenum.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
+            captured = True
             gamenum.ap.remove(i)
-            print(f"removing {i.name}")
             takenpiece = i
             if i.name[0] == "w":
                 gamenum.wp.remove(i)
@@ -629,7 +633,6 @@ def process_request(request, gamenum):
                 gamenum.bp.remove(i)
             tempitem = i
 
-    print(f"temp {tempitem.name}")
             
     if item.name[0] == "w" and gamenum.move:
         turn = True
@@ -640,10 +643,11 @@ def process_request(request, gamenum):
 
 
 
-    movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy)
+    movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy, True)
+    print(f"movevalid {movevalid, turn}")
+    if (newposx <= 0 or newposx >= 9) and captured:
+        movevalid = False
 
-    if movevalid and turn:
-        tempitem = None
     if not movevalid or not turn:
         item.placerx = 125 + tempx * 75
         item.xpos = tempx
@@ -655,11 +659,13 @@ def process_request(request, gamenum):
                 gamenum.wp.append(tempitem)
             else:
                 gamenum.bp.append(tempitem)
-        return False
+        return False, None
     if movevalid and turn:
         gamenum.move = not gamenum.move
-        print(f"tempitem {tempitem}")
-        return True
+        try:
+            return True, tempitem.name
+        except AttributeError:
+            return True, None
 
 
 
@@ -759,17 +765,19 @@ while True:
             break
         request = pickle.loads(data)
         print(request)
-        result = process_request(request,G1)
+        result, taken = process_request(request,G1)
         client.sendall(pickle.dumps(result))
         if result:  # if a move is valid it send to the other client so their board can update
-            print("yes result", tempitem)
             if client == client1:
                 while True:
                     try:
-                        if tempitem:
-                            print("yay")
-                            request.append(tempitem.name)
-                            data = pickle.loads(request)
+                        if taken:
+                            newpiece = pickle.dumps(taken+"new")
+                            client3.sendall(newpiece)
+                            client4.sendall(newpiece)
+                            newpiece = Piece(taken+"new", 0, 8, taken[0])
+                            G2.ap.append(newpiece)
+                            getattr(G2, newpiece.colour + "p").append(newpiece)
                         client2.sendall(data)  # keep trying to send until recieved
                         break
                     except OSError:
@@ -777,9 +785,13 @@ while True:
             else:
                 while True:
                     try:
-                        if tempitem:
-                            request.append(tempitem.name)
-                            data = pickle.loads(request)
+                        if taken:
+                            newpiece = pickle.dumps(taken+"new")
+                            client3.sendall(newpiece)
+                            client4.sendall(newpiece)
+                            newpiece = Piece(taken+"new", 0, 8, taken[0])
+                            G2.ap.append(newpiece)
+                            getattr(G2, newpiece.colour + "p").append(newpiece)
                         client1.sendall(data)
                         break
                     except OSError:
@@ -795,27 +807,34 @@ while True:
         if not data:
             break
         request = pickle.loads(data)
-        result = process_request(request,G2)
+        print(request)
+        result, taken = process_request(request,G2)
         client.sendall(pickle.dumps(result))
-        if result: #if a move is valid it send to the other client so their board can update
-
+        if result:  # if a move is valid it send to the other client so their board can update
             if client == client3:
                 while True:
                     try:
-                        if tempitem:
-                            print("yay")
-                            request.append(tempitem.name)
-                            data = pickle.loads(request)
-                        client4.sendall(data) #keep trying to send until recieved
+                        if taken:
+                            newpiece = pickle.dumps(taken+"new")
+                            client1.sendall(newpiece)
+                            client2.sendall(newpiece)
+                            newpiece = Piece(taken+"new", 0, 8, taken[0])
+                            G1.ap.append(newpiece)
+                            getattr(G1, newpiece.colour + "p").append(newpiece)
+                        client4.sendall(data)  # keep trying to send until recieved
                         break
                     except OSError:
                         pass
             else:
                 while True:
                     try:
-                        if tempitem:
-                            request.append(tempitem.name)
-                            data = pickle.loads(request)
+                        if taken:
+                            newpiece = pickle.dumps(taken+"new")
+                            client1.sendall(newpiece)
+                            client2.sendall(newpiece)
+                            newpiece = Piece(taken+"new", 0, 8, taken[0])
+                            G1.ap.append(newpiece)
+                            getattr(G1, newpiece.colour + "p").append(newpiece)
                         client3.sendall(data)
                         break
                     except OSError:

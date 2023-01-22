@@ -111,6 +111,23 @@ class Piece:
         elif self.name[1] == "b":
             self.image = wbishop_image
 
+    def update_image(self):
+        images = {
+            "wp": wpawn_image,
+            "wq": wqueen_image,
+            "wr": wrook_image,
+            "wb": wbishop_image,
+            "wn": wknight_image,
+            "wk": wking_image,
+            "bp": bpawn_image,
+            "bq": bqueen_image,
+            "br": brook_image,
+            "bb": bbishop_image,
+            "bn": bknight_image,
+            "bk": bking_image
+        }
+        self.image = images.get(self.name[:2],self.image)
+
 wp = []
 for i in range(1, 9):
     wp.append(Piece(f"wp{i}", i, 7, "w",wpawn_image))
@@ -154,6 +171,7 @@ client_socket.connect(('localhost', 8000))
 client_socket.send("client1".encode())
 
 while True:
+    newposx, newposy = None, None
     clock.tick(120)
     screen.fill(white)
     for event in pygame.event.get():
@@ -164,11 +182,11 @@ while True:
         screen.blit(i.image, (i.placerx, i.placery))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = pygame.mouse.get_pos()
-            for j in range(1, 9):
+            for j in range(0, 10):
                 if 200 + (j - 1) * 75 < x < 200 + j * 75:
                     newposx = j
                     break
-            for j in range(1, 9):
+            for j in range(0, 10):
                 if 75 + (j - 1) * 75 < y < 75 + j * 75:
                     newposy = j
                     break
@@ -243,31 +261,25 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                print(result)
-                try:
-                    newpiece = result[3]
-                    if newpiece[0] == "w":
-                        newobject = Piece(newpiece, 0, 0, "w")
-                        G.wp.append(newobject)
-                    else:
-                        newobject = Piece(newpiece, 0, 0, "b")
-                        G.bp.append(newobject)
-                    G.ap.append(newobject)
-                except IndexError:
-                    pass
-
-                G.move = not G.move
-                for i in G.ap:
-                    if i.xpos == result[1] and i.ypos == result[2]:
-                        G.ap.remove(i)
-                        if i.name[0] == "w":
-                            G.wp.remove(i)
-                        else:
-                            G.bp.remove(i)
-                    if i.name == result[0]:
-                        i.xpos, i.ypos = result[1],result[2]
-                        i.placerx = 125 + result[1] * 75
-                        i.placery = result[2] * 75
+                if type(result) == str:
+                    print("NEW PIECE")
+                    newpiece = Piece(result, 0, 8, result[0])
+                    newpiece.update_image()
+                    G.ap.append(newpiece)
+                    getattr(G,newpiece.colour+"p").append(newpiece)
+                else:
+                    G.move = not G.move
+                    for i in G.ap:
+                        if i.xpos == result[1] and i.ypos == result[2]:
+                            G.ap.remove(i)
+                            if i.name[0] == "w":
+                                G.wp.remove(i)
+                            else:
+                                G.bp.remove(i)
+                        if i.name == result[0]:
+                            i.xpos, i.ypos = result[1],result[2]
+                            i.placerx = 125 + result[1] * 75
+                            i.placery = result[2] * 75
             except socket.timeout:
                 # No result was received within the timeout
                 continue
