@@ -3,17 +3,10 @@ import pygame
 import socket
 import pickle
 
-
-
-
-
-
-
 pygame.init()
 screen = pygame.display.set_mode((1000, 800))
 pygame.display.set_caption('CLIENT 1')
 clock = pygame.time.Clock()
-
 
 image_constant = (75, 75)
 white = (255, 255, 255)
@@ -253,6 +246,7 @@ while True:
                     i.placerx = x
                     i.placery = y
                     item = i
+                    break
         if pygame.mouse.get_pressed()[0] and item:
             x, y = pygame.mouse.get_pos()
             item.placerx = x - 75 / 2
@@ -295,19 +289,15 @@ while True:
                     result = False
                 if result:
                     tempitem = None
-                    if item.name[0] == "t":
+                    if item.name[-1] == "w":
                         for bubble in bubbles:
-                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
+                            if bubble.xpos == tempx and bubble.ypos == tempy:
                                 bubble.add(-1)
                 if not result:
                     item.placerx = 125 + tempx * 75
                     item.xpos = tempx
                     item.placery = tempy * 75
                     item.ypos = tempy
-                    if item.name[0] == "t":
-                        for bubble in bubbles:
-                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
-                                bubble.add(1)
                     if tempitem:
                         G.ap.append(tempitem)
                         if tempitem.name[0] == "w":
@@ -363,8 +353,3 @@ while True:
     pygame.display.update()
 
 
-
-
-                
-
-    

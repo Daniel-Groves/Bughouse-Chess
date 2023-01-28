@@ -19,7 +19,7 @@ def move_valid(G,item, xsquare, ysquare,newposx,
 
 
     if newposx <= 0 or newposx >= 9:
-        if item.name[:1] == "wp" and ysquare == 8 or item.name[:1] == "bp" and ysquare == 1:
+        if (item.name[:1] == "wp" and ysquare == 8) or (item.name[:1] == "bp" and ysquare == 1) or piecethere(G,xsquare,ysquare,item):
             return False
         else:
                 return True
@@ -37,6 +37,7 @@ def move_valid(G,item, xsquare, ysquare,newposx,
     elif item.name[1] == "r":
         movevalid = rook_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[0:2] == "wp":
+        print(f"a {xsquare,ysquare}")
         movevalid = white_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
         if movevalid and not check_checker(G) and turn:
@@ -54,6 +55,7 @@ def move_valid(G,item, xsquare, ysquare,newposx,
     if simulation == True:
         return movevalid
 
+    print(f"aaa {movevalid,check_checker(G)}")
     return movevalid and not check_checker(G)
 
 
@@ -398,8 +400,12 @@ def check_checker(G, simulated_move=False):
                 G.checking_pieces.append(piece)
                 return checktake
         if piece.name[0:2] == "wp":
-            checktake = white_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos,
-                                         piece.move_num, piece, takenpiece)
+            if piece.name[-1]== "3":
+                print(f"hmmm {piece.xpos,piece.ypos}")
+                print(f"ooo {king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos}")
+            checktake = white_pawn_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos,
+                                         piece.move_num, piece, takenpiece,True)
+            print(f"checktake {checktake}")
             if checktake:
                 G.checking_pieces.append(piece)
                 return checktake
@@ -416,7 +422,6 @@ def check_checker(G, simulated_move=False):
 def piecethere(G, xsquare, ysquare, compare):
     print(xsquare,ysquare,compare.name)
     for i in G.ap:
-        print(i.name,i.xpos,i.ypos)
         if i.xpos == xsquare and i.ypos == ysquare and i != compare:
             return True
     print("returning False")
@@ -576,10 +581,13 @@ def rook_moves(G,x, y, startx, starty, rook):
     return returner
 
 
-def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece):
+def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece,simulated_move=False):
+    if simulated_move:
+        print(takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa))
     if x == 0 and y == -1 and not piecethere(G,startx, starty - 1, wpa):
         return True
-    elif abs(x) == 1 and y == -1 and takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa):
+    elif abs(x) == 1 and y == -1 and (takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa) or simulated_move):
+        print("returning true")
         return True
     elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 2, wpa) and first == 0:
         return True
@@ -599,7 +607,6 @@ def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
 
 def process_request(request, gamenum):
     for i in gamenum.ap:
-        print(i.name, i.xpos,i.ypos)
         if i.name == request[0]:
             item = i
             xsquare = request[1]
@@ -641,9 +648,9 @@ def process_request(request, gamenum):
     else:
         turn = False
 
+    print(item.name,xsquare,ysquare,newposx,newposy)
 
-
-    movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy, True)
+    movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy)
     print(f"movevalid {movevalid, turn}")
     if (newposx <= 0 or newposx >= 9) and captured:
         movevalid = False

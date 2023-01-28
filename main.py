@@ -140,9 +140,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.bp.remove(i)
                 tempitem = i
 
-        if vector == (1,-1):
-            print(check_checker(G, True))
-            print(king.xpos,king.ypos)
+
 
         if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
             if tempitem:
@@ -151,7 +149,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                     G.wp.append(tempitem)
                 else:
                     G.bp.append(tempitem)
-            print(vector)
             checkmate = False
             king.xpos = tempx
             king.ypos = tempy
@@ -167,7 +164,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
         king.xpos = tempx
         king.ypos = tempy
 
-    print(checkmate)
 
     for checker in G.checking_pieces:
         if checker.name[1] == "b":
@@ -450,14 +446,16 @@ def check_checker(G, simulated_move=False):
                 G.checking_pieces.append(piece)
                 return checktake
         if piece.name[0:2] == "wp":
-            checktake = white_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos,
-                                         piece.move_num, piece, takenpiece)
+            # if piece.name[-1] == "3":
+            #     print(piece.xpos - king.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos)
+            checktake = white_pawn_moves(G,piece.xpos - king.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos,
+                                         piece.move_num, piece, takenpiece, True)
             if checktake:
                 G.checking_pieces.append(piece)
                 return checktake
         elif piece.name[0:2] == "bp":
             checktake = black_pawn_moves(G,piece.xpos - king.xpos, piece.ypos - king.ypos, piece.xpos, piece.ypos,
-                                         piece.move_num, piece, takenpiece)
+                                         piece.move_num, piece, takenpiece, True)
             if checktake:
                 G.checking_pieces.append(piece)
                 return checktake
@@ -625,18 +623,26 @@ def rook_moves(G,x, y, startx, starty, rook):
     return returner
 
 
-def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece):
+def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece, simulated_move=False):
+    if simulated_move == False:
+        print(x,y,startx,starty)
+        print(takenpiecechecker(G, takenpiece, startx + x, starty - 1, wpa))
     if x == 0 and y == -1 and not piecethere(G,startx, starty - 1, wpa):
         return True
+    elif abs(x) == 1 and y == -1 and simulated_move:
+        return True
     elif abs(x) == 1 and y == -1 and takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa):
+        print("returning true")
         return True
     elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 2, wpa) and first == 0:
         return True
     else:
         return False
 
-def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece):
+def black_pawn_moves(G,x, y, startx, starty, first, bpa, takenpiece, simulated_move=False):
     if x == 0 and y == 1 and not piecethere(G,startx, starty + 1, bpa):
+        return True
+    elif abs(x) == 1 and y == -1 and simulated_move:
         return True
     elif abs(x) == 1 and y == 1 and takenpiecechecker(G,takenpiece, startx + x, starty + 1, bpa):
         return True

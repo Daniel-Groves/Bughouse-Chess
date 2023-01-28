@@ -96,7 +96,7 @@ class Piece:
     def place(self):
         board[self.ypos - 1][self.xpos - 1] = self.name
 
-    def update(self, x, y):
+    def update(self,x,y):
         self.xpos = x
         self.ypos = y
         self.placerx = 125 + self.xpos * 75
@@ -175,7 +175,7 @@ class Bubble:
 
 wp = []
 for i in range(1, 9):
-    wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
+    wp.append(Piece(f"wp{i}", i, 7, "w",wpawn_image))
 wking = Piece(f"wk", 5, 8, "w", wking_image)
 wp.append(wking)
 wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
@@ -247,6 +247,7 @@ while True:
                     i.placerx = x
                     i.placery = y
                     item = i
+                    break
         if pygame.mouse.get_pressed()[0] and item:
             x, y = pygame.mouse.get_pos()
             item.placerx = 9*75 - (x - 75 / 2) + 250
@@ -292,19 +293,15 @@ while True:
                     result = False
                 if result:
                     tempitem = None
-                    if item.name[0] == "t":
+                    if item.name[-1] == "w":
                         for bubble in bubbles:
-                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
+                            if bubble.xpos == tempx and bubble.ypos == tempy:
                                 bubble.add(-1)
                 if not result:
                     item.placerx = 125 + tempx * 75
                     item.xpos = tempx
                     item.placery = tempy * 75
                     item.ypos = tempy
-                    if item.name[0] == "t":
-                        for bubble in bubbles:
-                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
-                                bubble.add(1)
                     if tempitem:
                         G.ap.append(tempitem)
                         if tempitem.name[0] == "w":
@@ -358,20 +355,5 @@ while True:
 
 
     pygame.display.update()
-
-# data = pickle.loads(data)
-# print(data)
-
-# for count,piece in enumerate(ap):
-# piece.update(recieved[count][0],recieved[count][1])
-
-# while True:
-# screen.fill(white)
-# screen.blit(board_image, (200, 75))
-# for i in ap:
-#      screen.blit(i.image, (i.placerx, i.placery))
-#  pygame.display.update()
-
-
 
 
