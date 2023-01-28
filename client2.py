@@ -29,6 +29,15 @@ bknight_image = pygame.image.load(r"Images\bknight.png")
 brook_image = pygame.image.load(r"Images\brook.png")
 bpawn_image = pygame.image.load(r"Images\bpawn.png")
 
+number2 = pygame.image.load(r"Images\2.png")
+number3 = pygame.image.load(r"Images\3.png")
+number4 = pygame.image.load(r"Images\4.png")
+number5 = pygame.image.load(r"Images\5.png")
+number6 = pygame.image.load(r"Images\6.png")
+number7 = pygame.image.load(r"Images\7.png")
+number8 = pygame.image.load(r"Images\8.png")
+
+
 wking_image = pygame.transform.scale(wking_image, image_constant)
 wqueen_image = pygame.transform.scale(wqueen_image, image_constant)
 wbishop_image = pygame.transform.scale(wbishop_image, image_constant)
@@ -56,7 +65,6 @@ def snapper(x, y):
             break
     return snapposx, snapposy
 
-
 class Game:
     def __init__(self, wp, bp, move, wking, bking, checking_pieces=[]):
         self.wp = wp
@@ -66,7 +74,6 @@ class Game:
         self.wking = wking
         self.bking = bking
         self.checking_pieces = checking_pieces
-
 
 class Piece:
     def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num=0):
@@ -94,6 +101,18 @@ class Piece:
         self.ypos = y
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
+
+    def add_image(self):
+        if self.name[1] == "p":
+            self.image = wpawn_image
+        elif self.name[1] == "q":
+            self.image = wqueen_image
+        elif self.name[1] == "r":
+            self.image = wrook_image
+        elif self.name[1] == "n":
+            self.image = wknight_image
+        elif self.name[1] == "b":
+            self.image = wbishop_image
 
     def update_image(self):
         images = {
@@ -130,6 +149,29 @@ class Piece:
         self.placery = self.ypos * 75
         print("updated")
 
+class Bubble:
+    def __init__(self,xpos,ypos):
+        self.xpos = xpos
+        self.ypos = ypos
+        self.counter = 0
+        self.image = None
+
+    def add(self,numb=1):
+        self.counter += numb
+
+    def update_image(self):
+        images = {
+            "0": None,
+            "1": None,
+            "2": number2,
+            "3": number3,
+            "4": number4,
+            "5": number5,
+            "6": number6,
+            "7": number7,
+            "8": number8,
+        }
+        self.image = images.get(str(self.counter))
 
 wp = []
 for i in range(1, 9):
@@ -160,11 +202,19 @@ bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
 bp.append(Piece(f"br1", 1, 1, "w", brook_image))
 bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
+bubbles = []
+for i in range(8,3,-1):
+    bubbles.append(Bubble(0,i))
+
+for i in range(1,6):
+    bubbles.append(Bubble(9,i))
+
 G = Game(wp, bp, True, wking, bking)
 
 clock.tick(120)
 screen.fill(white)
 # print(check_checker(wp, bp, wking, bking))
+
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -224,15 +274,12 @@ while True:
                             G.bp.remove(i)
                         tempitem = i
 
-
                 if G.move == False:
                     print("sending")
                     print(9 - xsquare,9 - ysquare)
                     data = pickle.dumps([item.name, 9 - xsquare, 9 - ysquare])
                     item.xpos = 9 - item.xpos
                     item.ypos = 9 - item.ypos
-                    if item.name[1] == "p":
-                        print(f"pawn {item.xpos,item.ypos}")
                     while True:
                         try:
                             client_socket.sendall(data)
@@ -245,11 +292,19 @@ while True:
                     result = False
                 if result:
                     tempitem = None
+                    if item.name[0] == "t":
+                        for bubble in bubbles:
+                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
+                                bubble.add(-1)
                 if not result:
                     item.placerx = 125 + tempx * 75
                     item.xpos = tempx
                     item.placery = tempy * 75
                     item.ypos = tempy
+                    if item.name[0] == "t":
+                        for bubble in bubbles:
+                            if bubble.xpos == item.xpos and bubble.ypos == item.ypos:
+                                bubble.add(1)
                     if tempitem:
                         G.ap.append(tempitem)
                         if tempitem.name[0] == "w":
@@ -273,7 +328,10 @@ while True:
                     newpiece.update_image()
                     newpiece.update_position()
                     G.ap.append(newpiece)
-                    getattr(G, newpiece.colour + "p").append(newpiece)
+                    for bubble in bubbles:
+                        if bubble.xpos == newpiece.xpos and bubble.ypos == newpiece.ypos:
+                            bubble.add(1)
+                    getattr(G,newpiece.colour+"p").append(newpiece)
                 else:
                     G.move = not G.move
                     for i in G.ap:
@@ -290,7 +348,12 @@ while True:
             except socket.timeout:
                 # No result was received within the timeout
                 continue
-
+    for bubble in bubbles:
+        bubble.update_image()
+        if bubble.image:
+            screen.blit(bubble.image, (125 + (9-bubble.xpos) * 75, (9-bubble.ypos) * 75 + 50))
+        else:
+            pass
 
 
 

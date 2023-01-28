@@ -679,46 +679,35 @@ class Game:
 
 if __name__ == "__main__":
     wp = []
-    bp = []
-
-    wking = Piece(f"wk", 7, 8, "w", wking_image)
+    for i in range(1, 9):
+        wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
+    wking = Piece(f"wk", 5, 8, "w", wking_image)
     wp.append(wking)
-
-    wp.append(Piece(f"wp1", 1, 7, "w", wpawn_image))
-    wp.append(Piece(f"wp2", 2, 7, "w", wpawn_image))
-    wp.append(Piece(f"wp3", 3, 7, "w", wpawn_image))
-    wp.append(Piece(f"wp4", 4, 6, "w", wpawn_image))
-    wp.append(Piece(f"wp5", 6, 7, "w", wpawn_image))
-    wp.append(Piece(f"wp6", 7, 7, "w", wpawn_image))
-    wp.append(Piece(f"wp7", 8, 7, "w", wpawn_image))
     wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
-    wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
-    wp.append(Piece(f"wr2", 6, 8, "w", wrook_image))
-    wp.append(Piece(f"wn1", 3, 6, "w", wknight_image))
-    wp.append(Piece(f"wn2", 6, 6, "w", wknight_image))
     wp.append(Piece(f"wb1", 3, 8, "w", wbishop_image))
-    wp.append(Piece(f"wb2", 2, 4, "w", wbishop_image))
+    wp.append(Piece(f"wb2", 6, 8, "w", wbishop_image))
+    wp.append(Piece(f"wn1", 2, 8, "w", wknight_image))
+    wp.append(Piece(f"wn2", 7, 8, "w", wknight_image))
+    wp.append(Piece(f"wr1", 1, 8, "w", wrook_image))
+    wp.append(Piece(f"wr2", 8, 8, "w", wrook_image))
 
-    bp.append(Piece(f"bp1", 1, 2, "b", bpawn_image))
-    bp.append(Piece(f"bp2", 2, 2, "b", bpawn_image))
-    bp.append(Piece(f"bp3", 3, 4, "b", bpawn_image))
-    bp.append(Piece(f"bp4", 6, 2, "b", bpawn_image))
-    bp.append(Piece(f"bp5", 7, 2, "b", bpawn_image))
-    bp.append(Piece(f"bp5", 8, 2, "b", bpawn_image))
-    bp.append(Piece(f"bq", 4, 1, "b", bqueen_image))
-    bp.append(Piece(f"br1", 1, 1, "b", brook_image))
-    bp.append(Piece(f"br2", 8, 1, "b", brook_image))
-    bp.append(Piece(f"bb1", 3, 1, "b", bbishop_image))
-    bp.append(Piece(f"bb2", 6, 3, "b", bbishop_image))
-    bp.append(Piece(f"bn2", 3, 3, "b", bknight_image))
+    board = [[" " for i in range(8)] for i in range(8)]
+    print("".join([f"\n{i}" for i in board]))
 
+    bp = []
+    for i in range(1, 9):
+        bp.append(Piece(f"bp{i}", i, 2, "b", bpawn_image))
     bking = (Piece(f"bk", 5, 1, "w", bking_image))
     bp.append(bking)
-
-
+    bp.append(Piece(f"bq", 4, 1, "w", bqueen_image))
+    bp.append(Piece(f"bb1", 3, 1, "w", bbishop_image))
+    bp.append(Piece(f"bb2", 6, 1, "w", bbishop_image))
+    bp.append(Piece(f"bn1", 2, 1, "w", bknight_image))
+    bp.append(Piece(f"bn2", 7, 1, "w", bknight_image))
+    bp.append(Piece(f"br1", 1, 1, "w", brook_image))
+    bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
     G = Game(wp, bp, True, wking, bking)
-
 
 
 if __name__ == "__main__":
