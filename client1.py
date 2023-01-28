@@ -128,6 +128,33 @@ class Piece:
         }
         self.image = images.get(self.name[:2],self.image)
 
+    def update_position(self):
+        positions = {
+            "wp": (0,8),
+            "wq": (0,4),
+            "wr": (0,5),
+            "wb": (0,6),
+            "wn": (0,7),
+            "bp": (9,1),
+            "bq": (9,5),
+            "br": (9,4),
+            "bb": (9,3),
+            "bn": (9,2)
+        }
+        self.xpos, self.ypos = positions.get(self.name[:2])[0],positions.get(self.name[:2])[1]
+        self.placerx = 125 + self.xpos * 75
+        self.placery = self.ypos * 75
+        print("updated")
+
+class Bubble:
+    def __init__(self,xpos,ypos):
+        self.xpos = xpos
+        self.ypos = ypos
+        self.counter = 0
+
+    def add(self):
+        self.counter += 1
+
 wp = []
 for i in range(1, 9):
     wp.append(Piece(f"wp{i}", i, 7, "w",wpawn_image))
@@ -265,6 +292,7 @@ while True:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])
                     newpiece.update_image()
+                    newpiece.update_position()
                     G.ap.append(newpiece)
                     getattr(G,newpiece.colour+"p").append(newpiece)
                 else:
