@@ -339,6 +339,11 @@ while True:
                             else:
                                 G.bp.remove(i)
                         if i.name == result[0]:
+                            if i.name[-1] == "w":
+                                if i.xpos == 0 or i.xpos == 9:
+                                    for bubble in bubbles:
+                                        if bubble.xpos == i.xpos and bubble.ypos == i.ypos:
+                                            bubble.add(-1)
                             i.xpos, i.ypos = result[1],result[2]
                             i.placerx = 125 + result[1] * 75
                             i.placery = result[2] * 75

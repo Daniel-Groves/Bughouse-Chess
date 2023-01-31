@@ -37,7 +37,6 @@ number6 = pygame.image.load(r"Images\6.png")
 number7 = pygame.image.load(r"Images\7.png")
 number8 = pygame.image.load(r"Images\8.png")
 
-
 wking_image = pygame.transform.scale(wking_image, image_constant)
 wqueen_image = pygame.transform.scale(wqueen_image, image_constant)
 wbishop_image = pygame.transform.scale(wbishop_image, image_constant)
@@ -52,6 +51,7 @@ bknight_image = pygame.transform.scale(bknight_image, image_constant)
 brook_image = pygame.transform.scale(brook_image, image_constant)
 bpawn_image = pygame.transform.scale(bpawn_image, image_constant)
 
+
 def snapper(x, y):
     snapposx, snapposy = 0, 0
     for i in range(1, 9):
@@ -64,8 +64,9 @@ def snapper(x, y):
             break
     return snapposx, snapposy
 
+
 class Game:
-    def __init__(self,wp,bp, move, wking, bking, checking_pieces=[]):
+    def __init__(self, wp, bp, move, wking, bking, checking_pieces=[]):
         self.wp = wp
         self.bp = bp
         self.ap = wp + bp
@@ -73,6 +74,7 @@ class Game:
         self.wking = wking
         self.bking = bking
         self.checking_pieces = checking_pieces
+
 
 class Piece:
     def __init__(self, name, xpos, ypos, colour, image=wking_image, move_num=0):
@@ -94,8 +96,8 @@ class Piece:
 
     def place(self):
         board[self.ypos - 1][self.xpos - 1] = self.name
-        
-    def update(self,x,y):
+
+    def update(self, x, y):
         self.xpos = x
         self.ypos = y
         self.placerx = 125 + self.xpos * 75
@@ -128,34 +130,35 @@ class Piece:
             "bn": bknight_image,
             "bk": bking_image
         }
-        self.image = images.get(self.name[:2],self.image)
+        self.image = images.get(self.name[:2], self.image)
 
     def update_position(self):
         positions = {
-            "wp": (0,8),
-            "wq": (0,4),
-            "wr": (0,5),
-            "wb": (0,6),
-            "wn": (0,7),
-            "bp": (9,1),
-            "bq": (9,5),
-            "br": (9,4),
-            "bb": (9,3),
-            "bn": (9,2)
+            "wp": (0, 8),
+            "wq": (0, 4),
+            "wr": (0, 5),
+            "wb": (0, 6),
+            "wn": (0, 7),
+            "bp": (9, 1),
+            "bq": (9, 5),
+            "br": (9, 4),
+            "bb": (9, 3),
+            "bn": (9, 2)
         }
-        self.xpos, self.ypos = positions.get(self.name[:2])[0],positions.get(self.name[:2])[1]
+        self.xpos, self.ypos = positions.get(self.name[:2])[0], positions.get(self.name[:2])[1]
         self.placerx = 125 + self.xpos * 75
         self.placery = self.ypos * 75
         print("updated")
 
+
 class Bubble:
-    def __init__(self,xpos,ypos):
+    def __init__(self, xpos, ypos):
         self.xpos = xpos
         self.ypos = ypos
         self.counter = 0
         self.image = None
 
-    def add(self,numb=1):
+    def add(self, numb=1):
         self.counter += numb
 
     def update_image(self):
@@ -172,9 +175,10 @@ class Bubble:
         }
         self.image = images.get(str(self.counter))
 
+
 wp = []
 for i in range(1, 9):
-    wp.append(Piece(f"wp{i}", i, 7, "w",wpawn_image))
+    wp.append(Piece(f"wp{i}", i, 7, "w", wpawn_image))
 wking = Piece(f"wk", 5, 8, "w", wking_image)
 wp.append(wking)
 wp.append(Piece(f"wq", 4, 8, "w", wqueen_image))
@@ -202,18 +206,17 @@ bp.append(Piece(f"br1", 1, 1, "w", brook_image))
 bp.append(Piece(f"br2", 8, 1, "w", brook_image))
 
 bubbles = []
-for i in range(8,3,-1):
-    bubbles.append(Bubble(0,i))
+for i in range(8, 3, -1):
+    bubbles.append(Bubble(0, i))
 
-for i in range(1,6):
-    bubbles.append(Bubble(9,i))
+for i in range(1, 6):
+    bubbles.append(Bubble(9, i))
 
 G = Game(wp, bp, True, wking, bking)
 
 clock.tick(120)
 screen.fill(white)
 # print(check_checker(wp, bp, wking, bking))
-
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -324,7 +327,7 @@ while True:
                     for bubble in bubbles:
                         if bubble.xpos == newpiece.xpos and bubble.ypos == newpiece.ypos:
                             bubble.add(1)
-                    getattr(G,newpiece.colour+"p").append(newpiece)
+                    getattr(G, newpiece.colour + "p").append(newpiece)
                 else:
                     G.move = not G.move
                     for i in G.ap:
@@ -335,7 +338,12 @@ while True:
                             else:
                                 G.bp.remove(i)
                         if i.name == result[0]:
-                            i.xpos, i.ypos = result[1],result[2]
+                            if i.name[-1] == "w":
+                                if i.xpos == 0 or i.xpos == 9:
+                                    for bubble in bubbles:
+                                        if bubble.xpos == i.xpos and bubble.ypos == i.ypos:
+                                            bubble.add(-1)
+                            i.xpos, i.ypos = result[1], result[2]
                             i.placerx = 125 + result[1] * 75
                             i.placery = result[2] * 75
             except socket.timeout:
@@ -348,8 +356,4 @@ while True:
         else:
             pass
 
-
-
     pygame.display.update()
-
-
