@@ -37,7 +37,6 @@ def move_valid(G,item, xsquare, ysquare,newposx,
     elif item.name[1] == "r":
         movevalid = rook_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item)
     elif item.name[0:2] == "wp":
-        print(f"a {xsquare,ysquare}")
         movevalid = white_pawn_moves(G,-(newposx - xsquare), ysquare - newposy, newposx, newposy, item.move_num, item,
                                      takenpiece)
         if movevalid and not check_checker(G) and turn:
@@ -55,11 +54,13 @@ def move_valid(G,item, xsquare, ysquare,newposx,
     if simulation == True:
         return movevalid
 
-    print(f"aaa {movevalid,check_checker(G)}")
     return movevalid and not check_checker(G)
 
 
 def checkmate_checker(G):  # function to check if it is checkmate
+    print("PPPPPPPPP")
+    for i in G.ap:
+        print(i.name)
     checkmate = True
     global king
     global tempitem
@@ -278,6 +279,9 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
                         piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                         if i == 0:
+                            print(checker.name)
+                            for i in G.ap:
+                                print(i.name)
                             G.ap.remove(checker)
                             takenpiece = checker
                             if checker.name[0] == "w":
@@ -366,6 +370,8 @@ def check_checker(G, simulated_move=False):
     elif simulated_move == False:
         white_pieces = not G.move
 
+    print(f"white {white_pieces}")
+
     if white_pieces:
         pieces = G.wp
         king = G.bking
@@ -400,12 +406,8 @@ def check_checker(G, simulated_move=False):
                 G.checking_pieces.append(piece)
                 return checktake
         if piece.name[0:2] == "wp":
-            if piece.name[-1]== "3":
-                print(f"hmmm {piece.xpos,piece.ypos}")
-                print(f"ooo {king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos}")
             checktake = white_pawn_moves(G,king.xpos - piece.xpos, king.ypos - piece.ypos, piece.xpos, piece.ypos,
                                          piece.move_num, piece, takenpiece,True)
-            print(f"checktake {checktake}")
             if checktake:
                 G.checking_pieces.append(piece)
                 return checktake
@@ -420,11 +422,9 @@ def check_checker(G, simulated_move=False):
 
 
 def piecethere(G, xsquare, ysquare, compare):
-    print(xsquare,ysquare,compare.name)
     for i in G.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i != compare:
             return True
-    print("returning False")
     return False
 
 
@@ -582,12 +582,9 @@ def rook_moves(G,x, y, startx, starty, rook):
 
 
 def white_pawn_moves(G,x, y, startx, starty, first, wpa, takenpiece,simulated_move=False):
-    if simulated_move:
-        print(takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa))
     if x == 0 and y == -1 and not piecethere(G,startx, starty - 1, wpa):
         return True
     elif abs(x) == 1 and y == -1 and (takenpiecechecker(G,takenpiece, startx + x, starty - 1, wpa) or simulated_move):
-        print("returning true")
         return True
     elif x == 0 and y == -2 and not piecethere(G,startx + x, starty - 2, wpa) and first == 0:
         return True
@@ -648,10 +645,8 @@ def process_request(request, gamenum):
     else:
         turn = False
 
-    print(item.name,xsquare,ysquare,newposx,newposy)
 
     movevalid = move_valid(gamenum,item, xsquare, ysquare, newposx, newposy)
-    print(f"movevalid {movevalid, turn}")
     if (newposx <= 0 or newposx >= 9) and captured:
         movevalid = False
 
@@ -669,6 +664,12 @@ def process_request(request, gamenum):
         return False, None
     if movevalid and turn:
         gamenum.move = not gamenum.move
+        print(f"aa {check_checker(gamenum)}")
+        if check_checker(gamenum):
+            print("yes")
+            if checkmate_checker(gamenum):
+                print("checkmate")
+                time.sleep(100)
         try:
             return True, tempitem.name
         except AttributeError:
@@ -771,7 +772,6 @@ while True:
         if not data:
             break
         request = pickle.loads(data)
-        print(request)
         result, taken = process_request(request,G1)
         client.sendall(pickle.dumps(result))
         if result:  # if a move is valid it send to the other client so their board can update
@@ -814,7 +814,6 @@ while True:
         if not data:
             break
         request = pickle.loads(data)
-        print(request)
         result, taken = process_request(request,G2)
         client.sendall(pickle.dumps(result))
         if result:  # if a move is valid it send to the other client so their board can update
