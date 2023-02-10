@@ -3,6 +3,7 @@ import pickle
 import pygame
 import numpy
 import copy
+import time
 
 pygame.init()
 screen = pygame.display.set_mode((1,1),pygame.NOFRAME)
@@ -58,9 +59,7 @@ def move_valid(G,item, xsquare, ysquare,newposx,
 
 
 def checkmate_checker(G):  # function to check if it is checkmate
-    print("PPPPPPPPP")
-    for i in G.ap:
-        print(i.name)
+    # print("PPPPPPPPP")
     checkmate = True
     global king
     global tempitem
@@ -85,7 +84,10 @@ def checkmate_checker(G):  # function to check if it is checkmate
         king.xpos, king.ypos = king.xpos + vector[0], king.ypos + vector[1]
 
         for i in G.ap:
-            if i.xpos == king.xpos and i.ypos == king.ypos and i.name[0] != "k":
+            if i.xpos == king.xpos and i.ypos == king.ypos and i.name[1] != "k":
+                if i.name == "wq":
+                    print(vector)
+                    print("OOOO")
                 G.ap.remove(i)
                 takenpiece = i
                 if i.name[0] == "w":
@@ -93,12 +95,18 @@ def checkmate_checker(G):  # function to check if it is checkmate
                 else:
                     G.bp.remove(i)
                 tempitem = i
+                print(f"tempitem is {tempitem.name}")
 
 
+        if vector == (1,1):
+            print("hmmm")
+            print(check_checker(G))
 
-        if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G, True) and king.xpos > 0 and king.ypos > 0 and not blockage:
+        if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G) and king.xpos > 0 and king.ypos > 0 and not blockage:
+            print("a")
             if tempitem:
                 G.ap.append(tempitem)
+                print(f"readding1 {tempitem.name}")
                 if tempitem.name[0] == "w":
                     G.wp.append(tempitem)
                 else:
@@ -108,8 +116,10 @@ def checkmate_checker(G):  # function to check if it is checkmate
             king.ypos = tempy
             continue
         else:
+            print("b")
             if tempitem:
                 G.ap.append(tempitem)
+                print(f"readding {tempitem.name}")
                 if tempitem.name[0] == "w":
                     G.wp.append(tempitem)
                 else:
@@ -273,16 +283,22 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         tempitem = None
             else:
                 for i in range(0, abs(king.xpos - checker.xpos) + 1):
+                    print(i)
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
-                        piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
+                        try:
+                            piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
+                        except TypeError:
+                            print("type")
+                            print(i)
+                            print(type(i))
                         piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                         if i == 0:
-                            print(checker.name)
-                            for i in G.ap:
-                                print(i.name)
-                            G.ap.remove(checker)
+                            try:
+                                G.ap.remove(checker)
+                            except ValueError:
+                                print(f"ASDPKASPDk {checker.name}")
                             takenpiece = checker
                             if checker.name[0] == "w":
                                 G.wp.remove(checker)
@@ -370,7 +386,6 @@ def check_checker(G, simulated_move=False):
     elif simulated_move == False:
         white_pieces = not G.move
 
-    print(f"white {white_pieces}")
 
     if white_pieces:
         pieces = G.wp
@@ -378,8 +393,6 @@ def check_checker(G, simulated_move=False):
     else:
         pieces = G.bp
         king = G.wking
-
-
 
 
     for piece in pieces:
@@ -630,6 +643,7 @@ def process_request(request, gamenum):
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
             captured = True
             gamenum.ap.remove(i)
+            print(f" removed {i.name}")
             takenpiece = i
             if i.name[0] == "w":
                 gamenum.wp.remove(i)
@@ -650,6 +664,7 @@ def process_request(request, gamenum):
     if (newposx <= 0 or newposx >= 9) and captured:
         movevalid = False
 
+
     if not movevalid or not turn:
         item.placerx = 125 + tempx * 75
         item.xpos = tempx
@@ -669,7 +684,7 @@ def process_request(request, gamenum):
             print("yes")
             if checkmate_checker(gamenum):
                 print("checkmate")
-                time.sleep(100)
+                return "checkmate"
         try:
             return True, tempitem.name
         except AttributeError:
