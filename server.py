@@ -59,7 +59,6 @@ def move_valid(G,item, xsquare, ysquare,newposx,
 
 
 def checkmate_checker(G):  # function to check if it is checkmate
-    # print("PPPPPPPPP")
     checkmate = True
     global king
     global tempitem
@@ -684,7 +683,7 @@ def process_request(request, gamenum):
             print("yes")
             if checkmate_checker(gamenum):
                 print("checkmate")
-                return "checkmate"
+                return "checkmate", None
         try:
             return True, tempitem.name
         except AttributeError:
@@ -789,6 +788,12 @@ while True:
         request = pickle.loads(data)
         result, taken = process_request(request,G1)
         client.sendall(pickle.dumps(result))
+        if result == "checkmate":
+            client1.sendall(pickle.dumps("checkmate"))
+            client2.sendall(pickle.dumps("checkmate"))
+            client3.sendall(pickle.dumps("checkmate"))
+            client4.sendall(pickle.dumps("checkmate"))
+
         if result:  # if a move is valid it send to the other client so their board can update
             if client == client1:
                 while True:
@@ -831,6 +836,11 @@ while True:
         request = pickle.loads(data)
         result, taken = process_request(request,G2)
         client.sendall(pickle.dumps(result))
+        if result == "checkmate":
+            client1.sendall("checkmate")
+            client2.sendall("checkmate")
+            client3.sendall("checkmate")
+            client4.sendall("checkmate")
         if result:  # if a move is valid it send to the other client so their board can update
             if client == client3:
                 while True:

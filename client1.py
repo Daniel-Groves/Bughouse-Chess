@@ -2,12 +2,16 @@
 import pygame
 import socket
 import pickle
+import time
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 800))
 pygame.display.set_caption('CLIENT 1')
 clock = pygame.time.Clock()
 
+checkmate = False
+font = pygame.font.Font('freesansbold.ttf', 32)
+black = (0,0,0)
 image_constant = (75, 75)
 white = (255, 255, 255)
 king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)]
@@ -290,7 +294,11 @@ while True:
                     result = pickle.loads(client_socket.recv(1024))
                 else:
                     result = False
-                if result:
+                if result == "checkmate":
+                    print("CHECKMATE")
+                    screen.blit(font.render("CHECKMATE", True, black), (500,400))
+                    checkmate = True
+                elif result:
                     tempitem = None
                     if item.name[-1] == "w":
                         for bubble in bubbles:
@@ -318,7 +326,11 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                if type(result) == str:
+                if result == "checkmate":
+                    print("CHECKMATE")
+                    screen.blit(font.render("CHECKMATE", True, black), (500,400))
+                    checkmate = True
+                elif type(result) == str:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])
                     newpiece.update_image()
@@ -327,7 +339,7 @@ while True:
                     for bubble in bubbles:
                         if bubble.xpos == newpiece.xpos and bubble.ypos == newpiece.ypos:
                             bubble.add(1)
-                    getattr(G, newpiece.colour + "p").append(newpiece)
+                    getattr(G,newpiece.colour + "p").append(newpiece)
                 else:
                     G.move = not G.move
                     for i in G.ap:
@@ -357,3 +369,5 @@ while True:
             pass
 
     pygame.display.update()
+    if checkmate:
+        time.sleep(100)

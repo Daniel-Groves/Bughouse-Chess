@@ -291,7 +291,9 @@ while True:
                     result = pickle.loads(client_socket.recv(1024))
                 else:
                     result = False
-                if result:
+                if result == "checkmate":
+                    print("CHECKMATE")
+                elif result:
                     tempitem = None
                     if item.name[-1] == "w":
                         for bubble in bubbles:
@@ -319,7 +321,9 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                if type(result) == str:
+                if result == "checkmate":
+                    print("CHECKMATE")
+                elif type(result) == str:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])
                     newpiece.update_image()
@@ -328,7 +332,7 @@ while True:
                     for bubble in bubbles:
                         if bubble.xpos == newpiece.xpos and bubble.ypos == newpiece.ypos:
                             bubble.add(1)
-                    getattr(G,newpiece.colour+"p").append(newpiece)
+                    getattr(G,newpiece.colour + "p").append(newpiece)
                 else:
                     G.move = not G.move
                     for i in G.ap:
