@@ -8,6 +8,9 @@ screen = pygame.display.set_mode((1000, 800))
 pygame.display.set_caption('CLIENT 4')
 clock = pygame.time.Clock()
 
+checkmate = False
+font = pygame.font.Font('freesansbold.ttf', 32)
+black = (0,0,0)
 image_constant = (75, 75)
 white = (255, 255, 255)
 king_vectors = [(0, 1), (1, 1), (1, 0), (-1, 1), (0, -1), (-1, -1), (-1, 0), (1, -1)]
@@ -293,6 +296,8 @@ while True:
                     result = False
                 if result == "checkmate":
                     print("CHECKMATE")
+                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
+                    checkmate = True
                 elif result:
                     tempitem = None
                     if item.name[-1] == "w":
@@ -323,6 +328,8 @@ while True:
                 result = pickle.loads(client_socket.recv(1024))
                 if result == "checkmate":
                     print("CHECKMATE")
+                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
+                    checkmate = True
                 elif type(result) == str:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])
@@ -364,5 +371,6 @@ while True:
 
 
     pygame.display.update()
-
-
+    if checkmate:
+        while True:
+            clock.tick(120)

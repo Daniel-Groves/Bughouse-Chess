@@ -296,7 +296,7 @@ while True:
                     result = False
                 if result == "checkmate":
                     print("CHECKMATE")
-                    screen.blit(font.render("CHECKMATE", True, black), (500,400))
+                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
                     checkmate = True
                 elif result:
                     tempitem = None
@@ -328,7 +328,7 @@ while True:
                 result = pickle.loads(client_socket.recv(1024))
                 if result == "checkmate":
                     print("CHECKMATE")
-                    screen.blit(font.render("CHECKMATE", True, black), (500,400))
+                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
                     checkmate = True
                 elif type(result) == str:
                     print("NEW PIECE")
@@ -370,4 +370,5 @@ while True:
 
     pygame.display.update()
     if checkmate:
-        time.sleep(100)
+        while True:
+            clock.tick(120)
