@@ -63,6 +63,9 @@ def checkmate_checker(G):  # function to check if it is checkmate
     global king
     global tempitem
     tempitem = None
+
+    print(f"hello {G.move}")
+
     if G.move:  # see whose move it is in order to determine for who we are detecting checkmate
         pieces = [piece for piece in G.wp if piece.name[1] != "k"]
         king = G.wking
@@ -84,9 +87,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
 
         for i in G.ap:
             if i.xpos == king.xpos and i.ypos == king.ypos and i.name[1] != "k":
-                if i.name == "wq":
-                    print(vector)
-                    print("OOOO")
                 G.ap.remove(i)
                 takenpiece = i
                 if i.name[0] == "w":
@@ -94,18 +94,11 @@ def checkmate_checker(G):  # function to check if it is checkmate
                 else:
                     G.bp.remove(i)
                 tempitem = i
-                print(f"tempitem is {tempitem.name}")
 
-
-        if vector == (1,1):
-            print("hmmm")
-            print(check_checker(G))
 
         if move_valid(G,king, king.xpos, king.ypos, tempx, tempy,True) and not check_checker(G) and king.xpos > 0 and king.ypos > 0 and not blockage:
-            print("a")
             if tempitem:
                 G.ap.append(tempitem)
-                print(f"readding1 {tempitem.name}")
                 if tempitem.name[0] == "w":
                     G.wp.append(tempitem)
                 else:
@@ -115,10 +108,8 @@ def checkmate_checker(G):  # function to check if it is checkmate
             king.ypos = tempy
             continue
         else:
-            print("b")
             if tempitem:
                 G.ap.append(tempitem)
-                print(f"readding {tempitem.name}")
                 if tempitem.name[0] == "w":
                     G.wp.append(tempitem)
                 else:
@@ -126,6 +117,8 @@ def checkmate_checker(G):  # function to check if it is checkmate
         tempitem = None
         king.xpos = tempx
         king.ypos = tempy
+
+    print(f"checkmate 1 {checkmate}")
 
 
     for checker in G.checking_pieces:
@@ -158,6 +151,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         else:
                             G.bp.append(tempitem)
                         tempitem = None
+        print(f"checkmate 2 {checkmate}")
         if checker.name[1] == "r":
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
@@ -218,6 +212,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                                 G.bp.append(tempitem)
                             tempitem = None
             pass
+        print(f"checkmate 2.5{checkmate}")
         if checker.name[1] == "q":
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
@@ -250,6 +245,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                             tempitem = None
+            print(f"checkmate 2.6{checkmate}")
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(king.xpos - checker.xpos)):
                     for piece in pieces:
@@ -280,24 +276,22 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                         tempitem = None
+                print(f"checkmate 2.7{checkmate}")
             else:
                 for i in range(0, abs(king.xpos - checker.xpos) + 1):
-                    print(i)
                     for piece in pieces:
                         tempx = piece.xpos
                         tempy = piece.ypos
                         try:
                             piece.xpos = checker.xpos + (numpy.sign(king.xpos - checker.xpos) * i)
                         except TypeError:
-                            print("type")
-                            print(i)
-                            print(type(i))
+                            pass
                         piece.ypos = checker.ypos + (numpy.sign(king.ypos - checker.ypos) * i)
                         if i == 0:
                             try:
                                 G.ap.remove(checker)
                             except ValueError:
-                                print(f"ASDPKASPDk {checker.name}")
+                                pass
                             takenpiece = checker
                             if checker.name[0] == "w":
                                 G.wp.remove(checker)
@@ -306,6 +300,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             tempitem = checker
                         if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                                       tempy) and not check_checker(G, True):
+                            print(piece.name,piece.xpos,piece.ypos,tempx,tempy)
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -319,6 +314,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                             tempitem = None
+        print(f"checkmate 3 {checkmate}")
         if checker.name[1] == "n":
             for piece in pieces:
                 tempx = piece.xpos
@@ -376,6 +372,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         G.bp.append(tempitem)
                     tempitem = None
         G.checking_pieces = []
+    print(f"final checkmate {checkmate}")
     return checkmate
 
 
@@ -578,9 +575,9 @@ def rook_moves(G,x, y, startx, starty, rook):
         elif x == 0:
             for i in range(1, abs(y) + 1):
                 if y > 0:
-                    vectory = starty - i
-                if y < 1:
                     vectory = starty + i
+                if y < 1:
+                    vectory = starty - i
                 if abs(y) == i and piecethereexclude(G,startx, vectory, rook):
                     return True
                 elif piecethere(G,startx, vectory, rook):
@@ -590,6 +587,9 @@ def rook_moves(G,x, y, startx, starty, rook):
                     returner = True
     else:
         returner = False
+
+    if returner == True:
+        print(x,y,startx,starty)
     return returner
 
 
