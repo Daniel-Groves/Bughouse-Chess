@@ -780,11 +780,10 @@ while True:
         print(request)
         result, taken = process_request(request,G1)
         if result == "checkmate":
-            print("retuning checkmate")
-            client1.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
-            client2.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
-            client3.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
-            client4.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
+            #send the clients the relevant checkmate information
+            info = pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1")
+            for client in client1,client2,client3,client4:
+                client.sendall(info)
         else:
             client.sendall(pickle.dumps(result))
 
@@ -831,10 +830,9 @@ while True:
         result, taken = process_request(request,G2)
 
         if result == "checkmate":
-            client1.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
-            client2.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
-            client3.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
-            client4.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
+            info = pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1")
+            for client in client1,client2,client3,client4:
+                client.sendall(info)
         else:
             client.sendall(pickle.dumps(result))
         if result:  # if a move is valid it send to the other client so their board can update
