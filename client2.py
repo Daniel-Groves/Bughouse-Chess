@@ -9,7 +9,7 @@ pygame.display.set_caption('CLIENT 2')
 clock = pygame.time.Clock()
 
 checkmate = False
-font = pygame.font.Font('freesansbold.ttf', 32)
+font = pygame.font.Font('freesansbold.ttf', 16)
 black = (0,0,0)
 image_constant = (75, 75)
 white = (255, 255, 255)
@@ -294,10 +294,12 @@ while True:
                     result = pickle.loads(client_socket.recv(1024))
                 else:
                     result = False
-                if result == "checkmate":
-                    print("CHECKMATE")
-                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
-                    checkmate = True
+                print(result)
+                if type(result) != bool and type(result) != list:
+                    if result.split(",")[0] == "checkmate":
+                        print("CHECKMATE")
+                        screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285,20))
+                        checkmate = True
                 elif result:
                     tempitem = None
                     if item.name[-1] == "w":
@@ -326,10 +328,11 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                if result == "checkmate":
-                    print("CHECKMATE")
-                    screen.blit(font.render("CHECKMATE", True, black), (400,0))
-                    checkmate = True
+                if type(result) != bool and type(result) != list:
+                    if result.split(",")[0] == "checkmate":
+                        print("CHECKMATE")
+                        screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285, 20))
+                        checkmate = True
                 elif type(result) == str:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])

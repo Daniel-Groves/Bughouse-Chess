@@ -64,7 +64,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
     global tempitem
     tempitem = None
 
-    print(f"hello {G.move}")
 
     if G.move:  # see whose move it is in order to determine for who we are detecting checkmate
         pieces = [piece for piece in G.wp if piece.name[1] != "k"]
@@ -118,7 +117,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
         king.xpos = tempx
         king.ypos = tempy
 
-    print(f"checkmate 1 {checkmate}")
 
 
     for checker in G.checking_pieces:
@@ -151,7 +149,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         else:
                             G.bp.append(tempitem)
                         tempitem = None
-        print(f"checkmate 2 {checkmate}")
         if checker.name[1] == "r":
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
@@ -212,7 +209,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                                 G.bp.append(tempitem)
                             tempitem = None
             pass
-        print(f"checkmate 2.5{checkmate}")
         if checker.name[1] == "q":
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
@@ -245,7 +241,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                             tempitem = None
-            print(f"checkmate 2.6{checkmate}")
             if checker.ypos - king.ypos == 0:
                 for i in range(0, abs(king.xpos - checker.xpos)):
                     for piece in pieces:
@@ -276,7 +271,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                         tempitem = None
-                print(f"checkmate 2.7{checkmate}")
             else:
                 for i in range(0, abs(king.xpos - checker.xpos) + 1):
                     for piece in pieces:
@@ -300,7 +294,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             tempitem = checker
                         if move_valid(G,piece, piece.xpos, piece.ypos,tempx,
                                       tempy) and not check_checker(G, True):
-                            print(piece.name,piece.xpos,piece.ypos,tempx,tempy)
                             checkmate = False
                             piece.xpos = tempx
                             piece.ypos = tempy
@@ -314,7 +307,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             else:
                                 G.bp.append(tempitem)
                             tempitem = None
-        print(f"checkmate 3 {checkmate}")
         if checker.name[1] == "n":
             for piece in pieces:
                 tempx = piece.xpos
@@ -372,7 +364,6 @@ def checkmate_checker(G):  # function to check if it is checkmate
                         G.bp.append(tempitem)
                     tempitem = None
         G.checking_pieces = []
-    print(f"final checkmate {checkmate}")
     return checkmate
 
 
@@ -786,13 +777,16 @@ while True:
         if not data:
             break
         request = pickle.loads(data)
+        print(request)
         result, taken = process_request(request,G1)
-        client.sendall(pickle.dumps(result))
         if result == "checkmate":
-            client1.sendall(pickle.dumps("checkmate"))
-            client2.sendall(pickle.dumps("checkmate"))
-            client3.sendall(pickle.dumps("checkmate"))
-            client4.sendall(pickle.dumps("checkmate"))
+            print("retuning checkmate")
+            client1.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
+            client2.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
+            client3.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
+            client4.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 1"))
+        else:
+            client.sendall(pickle.dumps(result))
 
         if result:  # if a move is valid it send to the other client so their board can update
             if client == client1:
@@ -835,12 +829,14 @@ while True:
             break
         request = pickle.loads(data)
         result, taken = process_request(request,G2)
-        client.sendall(pickle.dumps(result))
+
         if result == "checkmate":
-            client1.sendall("checkmate")
-            client2.sendall("checkmate")
-            client3.sendall("checkmate")
-            client4.sendall("checkmate")
+            client1.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
+            client2.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
+            client3.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
+            client4.sendall(pickle.dumps(f"checkmate, The {'white' if request[0][0] == 'w' else 'black'} player has delivered checkmate on Board 2"))
+        else:
+            client.sendall(pickle.dumps(result))
         if result:  # if a move is valid it send to the other client so their board can update
             if client == client3:
                 while True:
