@@ -272,7 +272,7 @@ board = [[" " for i in range(8)] for i in range(8)]
         Piece(f"br1", 1, 7, "b", brook_image),
         Piece(f"br2", 2, 8, "b", brook_image),
         Piece(f"bn1", 6, 3, "b", bpawn_image)],
-     False,
+     True,
      True
      ),
     (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 11
@@ -428,7 +428,7 @@ board = [[" " for i in range(8)] for i in range(8)]
      False,
      False
      ),
-    (Piece(f"wk", 5, 8, "w", wking_image), #TEST CASE 15
+    (Piece(f"wk", 5, 8, "w", wking_image), #TEST CASE 17
         Piece(f"bk", 7, 1, "b", bking_image),
         [Piece(f"wk", 5, 8, "w", wking_image),
          Piece(f"wp1", 1, 7, "w", wpawn_image),
@@ -463,7 +463,7 @@ board = [[" " for i in range(8)] for i in range(8)]
      False,
      True
      ),
-    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 15
+    (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 18
         Piece(f"bk", 7, 1, "b", bking_image),
         [Piece(f"wk", 7, 8, "w", wking_image),
          Piece(f"wp1", 1, 6, "w", wpawn_image),
@@ -498,6 +498,7 @@ def test_check(wking,bking,wp,bp,expected_result,move):
     G = Game(wp, bp, move, wking, bking, [])
 
     print(G.checking_pieces)
+    print(expected_result)
 
     for piece in G.ap:
         print(piece.name, piece.xpos, piece.ypos)
