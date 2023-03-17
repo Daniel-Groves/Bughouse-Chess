@@ -120,6 +120,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
 
     for checker in G.checking_pieces:
         if checker.name[1] == "b":
+            #if checker is a Bishop, check if pieces can block/take it
             for i in range(0, abs(king.xpos - checker.xpos) + 1):
                 for piece in pieces:
                     tempx, tempy = piece.xpos, piece.ypos
@@ -149,6 +150,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             G.bp.append(tempitem)
                         tempitem = None
         if checker.name[1] == "r":
+            # if checker is a rook, check if pieces can block/take it
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
                     for piece in pieces:
@@ -209,6 +211,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                             tempitem = None
             pass
         if checker.name[1] == "q":
+            # if checker is a Queen, check if pieces can block/take it
             if checker.xpos - king.xpos == 0:
                 for i in range(0, abs(king.ypos - checker.ypos)):
                     for piece in pieces:
@@ -307,6 +310,7 @@ def checkmate_checker(G):  # function to check if it is checkmate
                                 G.bp.append(tempitem)
                             tempitem = None
         if checker.name[1] == "n":
+            # if checker is a knight, check if pieces can take it
             for piece in pieces:
                 tempx = piece.xpos
                 tempy = piece.ypos
@@ -379,6 +383,8 @@ def check_checker(G, simulated_move=False):
         pieces = G.bp
         king = G.wking
 
+    #if any pieces can take the king, then they are recorded as a checking piece
+
     for piece in pieces:
         if piece.name[1] == "k":
             checktake = False
@@ -419,6 +425,7 @@ def check_checker(G, simulated_move=False):
 
 
 def piecethere(G, xsquare, ysquare, compare):
+    #function to return if a piece is on a square
     for i in G.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i != compare:
             return True
@@ -426,6 +433,7 @@ def piecethere(G, xsquare, ysquare, compare):
 
 
 def piecethereexclude(G, xsquare, ysquare, compare):
+    # function to return if a piece of different color is on a square
     for i in G.ap:
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != compare.name[0]:
             return True
@@ -433,6 +441,7 @@ def piecethereexclude(G, xsquare, ysquare, compare):
 
 
 def takenpiecechecker(G, takenpiece, xsquare, ysquare, compare):
+    # function to check if there is a takenpiece
     if not takenpiece:
         return False
     if takenpiece.xpos == xsquare and takenpiece.ypos == ysquare and takenpiece.name != compare.name:
@@ -443,6 +452,7 @@ def takenpiecechecker(G, takenpiece, xsquare, ysquare, compare):
 
 
 def king_moves(G, x, y, startx, starty, item):
+    #returns the validity of an attempted king move
     if abs(x) < 2 and abs(y) < 2 and not piecethere(G, startx + x, starty + y, item):
         returner = True
         for vector in king_vectors:
@@ -460,6 +470,7 @@ def king_moves(G, x, y, startx, starty, item):
 
 
 def queen_moves(G, x, y, startx, starty, queen):
+    # returns the validity of an attempted queen move
     returner = True
     if x == 0 and y == 0:
         returner = False
@@ -512,6 +523,7 @@ def queen_moves(G, x, y, startx, starty, queen):
 
 
 def bishop_moves(G, x, y, startx, starty, bishop):
+    # returns the validity of an attempted bishop move
     global returner
     if abs(x) == abs(y):
         for i in range(1, abs(x) + 1):
@@ -537,6 +549,7 @@ def bishop_moves(G, x, y, startx, starty, bishop):
 
 
 def knight_moves(G, x, y, startx, starty, knight):
+    # returns the validity of an attempted knight move
     if (abs(x) == 1 and abs(y) == 2) or (abs(x) == 2 and abs(y) == 1):
         if piecethereexclude(G, startx + x, starty + y, knight) or not piecethere(G, startx + x, starty + y, knight):
             return True
@@ -545,6 +558,7 @@ def knight_moves(G, x, y, startx, starty, knight):
 
 
 def rook_moves(G, x, y, startx, starty, rook):
+    # returns the validity of an attempted rook move
     returner = False
     if x == 0 or y == 0:
         if y == 0:
@@ -581,6 +595,7 @@ def rook_moves(G, x, y, startx, starty, rook):
 
 
 def white_pawn_moves(G, x, y, startx, starty, first, wpa, takenpiece, simulated_move=False):
+    # returns the validity of an attempted white pawn move
     if x == 0 and y == -1 and not piecethere(G, startx, starty - 1, wpa):
         return True
     elif abs(x) == 1 and y == -1 and (takenpiecechecker(G, takenpiece, startx + x, starty - 1, wpa) or simulated_move):
@@ -592,6 +607,7 @@ def white_pawn_moves(G, x, y, startx, starty, first, wpa, takenpiece, simulated_
 
 
 def black_pawn_moves(G, x, y, startx, starty, first, bpa, takenpiece):
+    # returns the validity of an attempted black pawn move
     if x == 0 and y == 1 and not piecethere(G, startx, starty + 1, bpa):
         return True
     elif abs(x) == 1 and y == 1 and takenpiecechecker(G, takenpiece, startx + x, starty + 1, bpa):
@@ -603,6 +619,7 @@ def black_pawn_moves(G, x, y, startx, starty, first, bpa, takenpiece):
 
 
 def process_request(request, gamenum):
+    #function to process requests
     for i in gamenum.ap:
         if i.name == request[0]:
             item = i
@@ -624,6 +641,7 @@ def process_request(request, gamenum):
     item.xpos = xsquare
     item.ypos = ysquare
     for i in gamenum.ap:
+        #simulates a piece capture
         if i.xpos == xsquare and i.ypos == ysquare and i.name[0] != item.name[0]:
             captured = True
             gamenum.ap.remove(i)
@@ -643,10 +661,12 @@ def process_request(request, gamenum):
         turn = False
 
     movevalid = move_valid(gamenum, item, xsquare, ysquare, newposx, newposy)
+    #if a piece from the side of the board captures a piece, it is not valid
     if (newposx <= 0 or newposx >= 9) and captured:
         movevalid = False
 
     if not movevalid or not turn:
+        #if the move isn't valid, return it to original state
         item.placerx = 125 + tempx * 75
         item.xpos = tempx
         item.placery = tempy * 75
@@ -659,12 +679,11 @@ def process_request(request, gamenum):
                 gamenum.bp.append(tempitem)
         return False, None
     if movevalid and turn:
+        #if move is valid, change whose move it is
         gamenum.move = not gamenum.move
-        print(f"aa {check_checker(gamenum)}")
         if check_checker(gamenum):
-            print("yes")
+            #check for checkmate
             if checkmate_checker(gamenum):
-                print("checkmate")
                 return "checkmate", None
         try:
             return True, tempitem.name
