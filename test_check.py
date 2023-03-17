@@ -75,7 +75,7 @@ board = [[" " for i in range(8)] for i in range(8)]
          Piece(f"bp1", 6, 2, "b", bpawn_image),
          Piece(f"bp2", 7, 3, "b", bpawn_image),
          Piece(f"bp3", 1, 3, "b", bpawn_image)],
-        False,
+        True,
         False),
     (Piece(f"wk", 7, 8, "w", wking_image), #TEST CASE 2
         Piece(f"bk", 5, 1, "b", bking_image),

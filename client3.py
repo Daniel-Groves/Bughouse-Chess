@@ -291,11 +291,10 @@ while True:
                 else:
                     result = False
                 print(result)
-                if type(result) != bool and type(result) != list:
-                    if result.split(",")[0] == "checkmate":
-                        print("CHECKMATE")
-                        screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285,20))
-                        checkmate = True
+                if type(result) != bool and type(result) != list and result.split(",")[0] == "checkmate":
+                    print("CHECKMATE")
+                    screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285,20))
+                    checkmate = True
                 elif result:
                     tempitem = None
                     if item.name[-1] == "w":
@@ -324,11 +323,10 @@ while True:
             client_socket.settimeout(0.0000001)  # Set a short timeout
             try:
                 result = pickle.loads(client_socket.recv(1024))
-                if type(result) != bool and type(result) != list:
-                    if result.split(",")[0] == "checkmate":
-                        print("CHECKMATE")
-                        screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285, 20))
-                        checkmate = True
+                if type(result) != bool and type(result) != list and result.split(",")[0] == "checkmate":
+                    print("CHECKMATE")
+                    screen.blit(font.render(f"{result.split(',')[1]}", True, black), (285, 20))
+                    checkmate = True
                 elif type(result) == str:
                     print("NEW PIECE")
                     newpiece = Piece(result, 0, 8, result[0])
